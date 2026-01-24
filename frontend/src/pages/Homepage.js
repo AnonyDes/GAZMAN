@@ -99,7 +99,7 @@ const Homepage = () => {
 
       {/* Promotional Banner */}
       <div className="px-4 py-4">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg\" data-testid=\"promo-banner\">
+        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-2xl p-6 text-white shadow-lg" data-testid="promo-banner">
           <div className="flex justify-between items-center">
             <div className="flex-1">
               <h3 className="text-lg font-bold mb-1">Fast Gas Delivery</h3>
