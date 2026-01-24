@@ -54,7 +54,7 @@ const Homepage = () => {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
-      <div className=\"bg-white px-4 py-4 shadow-sm\" data-testid=\"homepage-header\">
+      <div className="bg-white px-4 py-4 shadow-sm" data-testid="homepage-header">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-gradient-to-br from-blue-900 to-blue-700 rounded-full flex items-center justify-center text-white font-bold">
