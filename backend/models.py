@@ -67,6 +67,8 @@ class Product(ProductBase):
 # Cart Models
 class CartItem(BaseModel):
     product_id: str
+    product_name: str
+    product_image: str
     quantity: int
     size: str
     price: float
