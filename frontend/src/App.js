@@ -6,7 +6,7 @@ import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
-import Home from '@/pages/Home';
+import Homepage from '@/pages/Homepage';
 import '@/App.css';
 
 function App() {
@@ -22,16 +22,19 @@ function App() {
           
           {/* Protected Routes */}
           <Route
-            path="/"
+            path="/home"
             element={
               <ProtectedRoute>
-                <Home />
+                <Homepage />
               </ProtectedRoute>
             }
           />
           
+          {/* Default route - redirect to home */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          
           {/* Catch all - redirect to home */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/home" replace />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
