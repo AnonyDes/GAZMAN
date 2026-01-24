@@ -23,11 +23,11 @@ function App() {
           {/* Protected Routes */}
           <Route
             path="/"
-            element="
+            element={
               <ProtectedRoute>
                 <Home />
               </ProtectedRoute>
-            "
+            }
           />
           
           {/* Catch all - redirect to home */}
