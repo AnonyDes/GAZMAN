@@ -190,7 +190,9 @@ const Homepage = () => {
                 </h3>
                 <p className="text-xs text-gray-500 mb-2">{product.capacity}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-orange-600 font-bold">${product.price}</span>
+                  <span className="text-orange-600 font-bold">
+                    {formatCurrency(product.price)}
+                  </span>
                   <div className="flex items-center space-x-1 text-xs text-gray-500">
                     <span>⭐</span>
                     <span>{product.rating}</span>
