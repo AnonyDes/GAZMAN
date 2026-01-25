@@ -12,6 +12,7 @@ import ProductDetail from '@/pages/ProductDetail';
 import ShoppingCart from '@/pages/ShoppingCart';
 import Checkout from '@/pages/Checkout';
 import OrderSuccess from '@/pages/OrderSuccess';
+import MyOrders from '@/pages/MyOrders';
 import '@/App.css';
 
 function App() {
@@ -71,6 +72,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <OrderSuccess />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/orders"
+            element={
+              <ProtectedRoute>
+                <MyOrders />
               </ProtectedRoute>
             }
           />
