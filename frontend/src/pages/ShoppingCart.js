@@ -70,8 +70,7 @@ const ShoppingCart = () => {
 
   const handleCheckout = () => {
     if (!cart || cart.items.length === 0) return;
-    // Navigate to checkout (to be implemented in Phase 3)
-    alert('Commande confirmée! (Phase 3: Ordre et suivi à venir)');
+    navigate('/checkout');
   };
 
   if (loading) {
