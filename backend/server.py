@@ -297,14 +297,12 @@ async def get_cart(current_user: User = Depends(get_current_user)):
 
 @api_router.post("/cart/items")
 async def add_to_cart(
-    product_id: str,
-    quantity: int = 1,
-    size: str = "medium",
+    request: AddToCartRequest,
     current_user: User = Depends(get_current_user)
 ):
     """Add item to cart or update quantity if exists."""
     # Verify product exists
-    product = await db.products.find_one({"id": product_id}, {"_id": 0})
+    product = await db.products.find_one({"id": request.product_id}, {"_id": 0})
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     
@@ -325,21 +323,21 @@ async def add_to_cart(
     items = cart.get("items", [])
     existing_item = None
     for item in items:
-        if item["product_id"] == product_id and item["size"] == size:
+        if item["product_id"] == request.product_id and item["size"] == request.size:
             existing_item = item
             break
     
     if existing_item:
         # Update quantity
-        existing_item["quantity"] += quantity
+        existing_item["quantity"] += request.quantity
     else:
         # Add new item
         items.append({
-            "product_id": product_id,
+            "product_id": request.product_id,
             "product_name": product["name"],
             "product_image": product["image_url"],
-            "quantity": quantity,
-            "size": size,
+            "quantity": request.quantity,
+            "size": request.size,
             "price": product["price"]
         })
     
