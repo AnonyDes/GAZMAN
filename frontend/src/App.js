@@ -13,6 +13,7 @@ import ShoppingCart from '@/pages/ShoppingCart';
 import Checkout from '@/pages/Checkout';
 import OrderSuccess from '@/pages/OrderSuccess';
 import MyOrders from '@/pages/MyOrders';
+import OrderDetails from '@/pages/OrderDetails';
 import '@/App.css';
 
 function App() {
