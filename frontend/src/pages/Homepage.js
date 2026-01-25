@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
 import { MapPin, Bell, ChevronRight } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
+import { formatCurrency } from '@/utils/currency';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
