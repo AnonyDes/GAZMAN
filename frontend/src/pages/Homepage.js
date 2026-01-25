@@ -13,7 +13,6 @@ const Homepage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [categories, setCategories] = useState([]);
-  const [popularProducts, setPopularProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
