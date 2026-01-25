@@ -356,8 +356,7 @@ async def add_to_cart(
 @api_router.put("/cart/items/{product_id}")
 async def update_cart_item(
     product_id: str,
-    quantity: int,
-    size: str = "medium",
+    request: UpdateCartRequest,
     current_user: User = Depends(get_current_user)
 ):
     """Update item quantity in cart."""
@@ -369,11 +368,11 @@ async def update_cart_item(
     item_found = False
     
     for item in items:
-        if item["product_id"] == product_id and item["size"] == size:
-            if quantity <= 0:
+        if item["product_id"] == product_id and item["size"] == request.size:
+            if request.quantity <= 0:
                 items.remove(item)
             else:
-                item["quantity"] = quantity
+                item["quantity"] = request.quantity
             item_found = True
             break
     
