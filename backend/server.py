@@ -277,21 +277,21 @@ async def get_cart(current_user: User = Depends(get_current_user)):
             "id": None,
             "items": [],
             "subtotal": 0,
-            "delivery_fee": 5.50,
-            "total": 5.50
+            "delivery_fee": 3500,
+            "total": 3500
         }
     
-    # Calculate totals
+    # Calculate totals (all in XAF - integers)
     subtotal = sum(item["price"] * item["quantity"] for item in cart.get("items", []))
-    delivery_fee = 5.50
+    delivery_fee = 3500  # 3,500 FCFA
     total = subtotal + delivery_fee
     
     return {
         "id": cart.get("id"),
         "items": cart.get("items", []),
-        "subtotal": round(subtotal, 2),
+        "subtotal": subtotal,
         "delivery_fee": delivery_fee,
-        "total": round(total, 2)
+        "total": total
     }
 
 @api_router.post("/cart/items")
