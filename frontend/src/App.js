@@ -84,6 +84,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/orders/:orderId"
+            element={
+              <ProtectedRoute>
+                <OrderDetails />
+              </ProtectedRoute>
+            }
+          />
           
           {/* Default route - redirect to home */}
           <Route path="/" element={<Navigate to="/home" replace />} />
