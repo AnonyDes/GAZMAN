@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
@@ -17,23 +17,23 @@ const OrderDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchOrder = useCallback(async () => {
-    try {
-      const response = await axios.get(`${API}/orders/${orderId}`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setOrder(response.data);
-      setLoading(false);
-    } catch (err) {
-      console.error('Error fetching order:', err);
-      setError('Commande introuvable');
-      setLoading(false);
-    }
-  }, [orderId, token]);
-
   useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const response = await axios.get(`${API}/orders/${orderId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setOrder(response.data);
+      } catch (err) {
+        console.error('Error fetching order:', err);
+        setError('Commande introuvable');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     fetchOrder();
-  }, [fetchOrder]);
+  }, [orderId, token]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
