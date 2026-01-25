@@ -33,7 +33,7 @@ def test_user():
         return {
             "email": email,
             "password": password,
-            "token": data.get("token"),
+            "token": data.get("access_token"),
             "user_id": data.get("user", {}).get("id")
         }
     else:
@@ -107,7 +107,7 @@ def test_user_with_order():
         pytest.skip(f"Failed to create test user: {response.text}")
     
     data = response.json()
-    token = data.get("token")
+    token = data.get("access_token")
     headers = {"Authorization": f"Bearer {token}"}
     
     # Get products to add to cart
