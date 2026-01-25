@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import axios from 'axios';
@@ -17,23 +17,23 @@ const OrderDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    fetchOrder();
-  }, [orderId]);
-
-  const fetchOrder = async () => {
+  const fetchOrder = useCallback(async () => {
     try {
       const response = await axios.get(`${API}/orders/${orderId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrder(response.data);
       setLoading(false);
-    } catch (error) {
-      console.error('Error fetching order:', error);
+    } catch (err) {
+      console.error('Error fetching order:', err);
       setError('Commande introuvable');
       setLoading(false);
     }
-  };
+  }, [orderId, token]);
+
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
