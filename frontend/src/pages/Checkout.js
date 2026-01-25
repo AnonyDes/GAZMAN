@@ -56,8 +56,8 @@ const Checkout = () => {
     
     if (!formData.phone.trim()) {
       newErrors.phone = 'Numéro de téléphone requis';
-    } else if (!/^\+?237\s?[6-9]\s?\d{2}\s?\d{2}\s?\d{2}\s?\d{2}$/.test(formData.phone.replace(/\s+/g, ' '))) {
-      newErrors.phone = 'Format: +237 6 XX XX XX XX';
+    } else if (!/^[6-9]\d{8}$/.test(formData.phone.replace(/\s+/g, ''))) {
+      newErrors.phone = 'Format: 6 XX XX XX XX (9 chiffres)';
     }
     
     setErrors(newErrors);
@@ -72,9 +72,15 @@ const Checkout = () => {
     setProcessing(true);
     
     try {
+      // Add +237 prefix to phone number
+      const orderData = {
+        ...formData,
+        phone: `+237 ${formData.phone}`
+      };
+      
       const response = await axios.post(
         `${API}/orders`,
-        formData,
+        orderData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
       
