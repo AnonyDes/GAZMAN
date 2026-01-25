@@ -71,7 +71,7 @@ class CartItem(BaseModel):
     product_image: str
     quantity: int
     size: str
-    price: float
+    price: int  # Price in XAF (FCFA)
 
 class CartBase(BaseModel):
     user_id: str
