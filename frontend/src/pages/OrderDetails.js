@@ -308,7 +308,7 @@ const OrderDetails = () => {
 
         {/* Help Section */}
         <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-4">
-          <p className="text-sm font-semibold text-blue-900 mb-1">Besoin d'aide ?</p>
+          <p className="text-sm font-semibold text-blue-900 mb-1">Besoin d&apos;aide ?</p>
           <p className="text-xs text-blue-700">
             Contactez notre service client au +237 6XX XXX XXX pour toute question concernant votre commande.
           </p>
