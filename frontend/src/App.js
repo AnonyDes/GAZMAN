@@ -7,6 +7,7 @@ import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Homepage from '@/pages/Homepage';
+import ProductCatalog from '@/pages/ProductCatalog';
 import '@/App.css';
 
 function App() {
@@ -26,6 +27,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <Homepage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <ProductCatalog />
               </ProtectedRoute>
             }
           />
