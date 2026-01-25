@@ -425,6 +425,106 @@ async def clear_cart(current_user: User = Depends(get_current_user)):
     return {"message": "Cart cleared"}
 
 # ============================================
+# Order Endpoints
+# ============================================
+
+@api_router.post("/orders")
+async def create_order(
+    checkout_data: CheckoutRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """Create order from cart and clear cart."""
+    # Get cart
+    cart = await db.carts.find_one({"user_id": current_user.id}, {"_id": 0})
+    if not cart or not cart.get("items"):
+        raise HTTPException(status_code=400, detail="Cart is empty")
+    
+    # Calculate totals
+    subtotal = sum(item["price"] * item["quantity"] for item in cart["items"])
+    delivery_fee = 0 if subtotal >= 20000 else 3500
+    total = subtotal + delivery_fee
+    
+    # Create order items with product images
+    order_items = []
+    for cart_item in cart["items"]:
+        order_items.append({
+            "product_id": cart_item["product_id"],
+            "product_name": cart_item["product_name"],
+            "product_image": cart_item["product_image"],
+            "quantity": cart_item["quantity"],
+            "size": cart_item["size"],
+            "price": cart_item["price"]
+        })
+    
+    # Create order
+    order = Order(
+        user_id=current_user.id,
+        items=order_items,
+        subtotal=subtotal,
+        delivery_fee=delivery_fee,
+        total=total,
+        delivery_address=checkout_data.delivery_address,
+        phone=checkout_data.phone,
+        payment_method=checkout_data.payment_method,
+        status="en_attente"
+    )
+    
+    # Save order
+    order_dict = order.model_dump()
+    order_dict['created_at'] = order_dict['created_at'].isoformat()
+    await db.orders.insert_one(order_dict)
+    
+    # Update stock for each product
+    for item in order_items:
+        await db.products.update_one(
+            {"id": item["product_id"]},
+            {"$inc": {"stock": -item["quantity"]}}
+        )
+    
+    # Clear cart
+    await db.carts.delete_one({"user_id": current_user.id})
+    
+    return {
+        "message": "Order created successfully",
+        "order_id": order.id,
+        "total": total
+    }
+
+@api_router.get("/orders")
+async def get_orders(current_user: User = Depends(get_current_user)):
+    """Get all orders for current user."""
+    orders = await db.orders.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(100)
+    
+    # Convert ISO timestamps
+    for order in orders:
+        if isinstance(order.get('created_at'), str):
+            order['created_at'] = datetime.fromisoformat(order['created_at'])
+    
+    return orders
+
+@api_router.get("/orders/{order_id}")
+async def get_order(
+    order_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get single order by ID."""
+    order = await db.orders.find_one(
+        {"id": order_id, "user_id": current_user.id},
+        {"_id": 0}
+    )
+    
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    if isinstance(order.get('created_at'), str):
+        order['created_at'] = datetime.fromisoformat(order['created_at'])
+    
+    return order
+
+# ============================================
 # Profile Endpoints
 # ============================================
 
