@@ -94,6 +94,7 @@ class CartResponse(BaseModel):
 class OrderItem(BaseModel):
     product_id: str
     product_name: str
+    product_image: str
     quantity: int
     size: str
     price: int  # XAF
@@ -105,7 +106,9 @@ class OrderBase(BaseModel):
     delivery_fee: int = 3500  # 3,500 FCFA
     total: int  # XAF
     delivery_address: str
-    status: Literal["pending", "confirmed", "in_progress", "delivered", "cancelled"] = "pending"
+    phone: str
+    payment_method: Literal["cash", "mobile_money"] = "cash"
+    status: Literal["en_attente", "en_preparation", "en_livraison", "livree", "annulee"] = "en_attente"
 
 class Order(OrderBase):
     model_config = ConfigDict(extra="ignore")
@@ -113,13 +116,15 @@ class Order(OrderBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class CheckoutRequest(BaseModel):
+    delivery_address: str
+    phone: str
+    payment_method: Literal["cash", "mobile_money"] = "cash"
+
 class AddToCartRequest(BaseModel):
     product_id: str
     quantity: int = 1
     size: str = "medium"
-
-class OrderCreate(BaseModel):
-    delivery_address: str
 
 # Delivery Models
 class Location(BaseModel):
