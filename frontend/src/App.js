@@ -9,6 +9,7 @@ import ResetPassword from '@/pages/ResetPassword';
 import Homepage from '@/pages/Homepage';
 import ProductCatalog from '@/pages/ProductCatalog';
 import ProductDetail from '@/pages/ProductDetail';
+import ShoppingCart from '@/pages/ShoppingCart';
 import '@/App.css';
 
 function App() {
@@ -44,6 +45,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProductDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <ShoppingCart />
               </ProtectedRoute>
             }
           />
