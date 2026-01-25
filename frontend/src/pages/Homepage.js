@@ -34,10 +34,6 @@ const Homepage = () => {
     navigate(`/products?category=${categoryValue}`);
   };
 
-  const handleProductClick = (productId) => {
-    navigate(`/products/${productId}`);
-  };
-
   const categoryIcons = {
     domestic: '🏠',
     industrial: '🏭',
