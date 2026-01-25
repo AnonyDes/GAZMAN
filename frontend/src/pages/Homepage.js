@@ -164,71 +164,6 @@ const Homepage = () => {
         </div>
       </div>
 
-      {/* Popular Products - Premium Cards */}
-      <div className="px-4 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900">Produits Populaires</h2>
-            <p className="text-gray-500 text-sm">Les plus demandés</p>
-          </div>
-          <button
-            onClick={() => navigate('/products')}
-            className="text-orange-600 font-semibold text-sm flex items-center hover:text-orange-700"
-            data-testid="see-all-products"
-          >
-            Tout voir
-            <ChevronRight size={16} className="ml-1" />
-          </button>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          {popularProducts.map((product) => (
-            <button
-              key={product.id}
-              onClick={() => handleProductClick(product.id)}
-              className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden active:scale-95"
-              data-testid={`product-${product.id}`}
-            >
-              {/* Product Image with Badge */}
-              <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
-                <img
-                  src={product.image_url}
-                  alt={product.name}
-                  className="w-full h-full object-contain"
-                />
-                {product.rating >= 4.7 && (
-                  <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold flex items-center space-x-1">
-                    <span>⭐</span>
-                    <span>{product.rating}</span>
-                  </div>
-                )}
-              </div>
-              
-              {/* Product Info */}
-              <div className="p-4">
-                <h3 className="font-bold text-sm text-gray-900 mb-1 truncate">
-                  {product.name}
-                </h3>
-                <p className="text-xs text-gray-500 mb-3 flex items-center">
-                  <span className="mr-1">📦</span>
-                  {product.capacity}
-                </p>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs text-gray-400 line-through">{formatCurrency(product.price + 2000)}</p>
-                    <p className="text-orange-600 font-bold text-base">
-                      {formatCurrency(product.price)}
-                    </p>
-                  </div>
-                  <div className="bg-orange-500 text-white w-8 h-8 rounded-lg flex items-center justify-center">
-                    <span className="text-lg">+</span>
-                  </div>
-                </div>
-              </div>
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Promotional Banner */}
       <div className="px-4 mb-6">
         <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-6 shadow-lg">
@@ -237,7 +172,10 @@ const Homepage = () => {
               <p className="text-blue-200 text-sm mb-1">🎉 Offre Spéciale</p>
               <h3 className="text-white font-bold text-lg mb-2">Livraison Gratuite</h3>
               <p className="text-blue-100 text-sm mb-3">Pour toute commande supérieure à 20 000 FCFA</p>
-              <button className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors">
+              <button 
+                onClick={() => navigate('/products')}
+                className="bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-50 transition-colors"
+              >
                 En profiter
               </button>
             </div>
