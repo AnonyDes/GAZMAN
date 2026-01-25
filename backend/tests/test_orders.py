@@ -259,7 +259,7 @@ class TestOrderSecurity:
         if response1.status_code != 201:
             pytest.skip("Failed to create first user")
         
-        token1 = response1.json().get("token")
+        token1 = response1.json().get("access_token")
         headers1 = {"Authorization": f"Bearer {token1}"}
         
         # Get products and add to cart
@@ -300,7 +300,7 @@ class TestOrderSecurity:
         if response2.status_code != 201:
             pytest.skip("Failed to create second user")
         
-        token2 = response2.json().get("token")
+        token2 = response2.json().get("access_token")
         headers2 = {"Authorization": f"Bearer {token2}"}
         
         # Try to access user 1's order with user 2's token
