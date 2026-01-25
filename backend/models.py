@@ -86,9 +86,9 @@ class Cart(CartBase):
 class CartResponse(BaseModel):
     id: str
     items: List[CartItem]
-    subtotal: float
-    delivery_fee: float = 5.50
-    total: float
+    subtotal: int  # XAF
+    delivery_fee: int = 3500  # 3,500 FCFA delivery fee
+    total: int  # XAF
 
 # Order Models
 class OrderItem(BaseModel):
