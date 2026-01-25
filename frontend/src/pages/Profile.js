@@ -1,0 +1,179 @@
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
+import { 
+  Package, 
+  MapPin, 
+  Phone, 
+  LogOut, 
+  ChevronRight, 
+  User,
+  Settings,
+  HelpCircle,
+  Shield
+} from 'lucide-react';
+import BottomNav from '@/components/BottomNav';
+
+const Profile = () => {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const handleLogout = () => {
+    if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
+      logout();
+      navigate('/login');
+    }
+  };
+
+  const menuItems = [
+    {
+      icon: Package,
+      label: 'Mes Commandes',
+      description: 'Voir l\'historique des commandes',
+      path: '/orders',
+      iconBg: 'bg-orange-100',
+      iconColor: 'text-orange-600'
+    },
+    {
+      icon: MapPin,
+      label: 'Mes Adresses',
+      description: 'Gérer mes adresses de livraison',
+      path: '/addresses',
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      comingSoon: true
+    },
+    {
+      icon: Settings,
+      label: 'Paramètres',
+      description: 'Modifier mes informations',
+      path: '/settings',
+      iconBg: 'bg-gray-100',
+      iconColor: 'text-gray-600',
+      comingSoon: true
+    },
+    {
+      icon: HelpCircle,
+      label: 'Aide & Support',
+      description: 'Centre d\'aide et FAQ',
+      path: '/help',
+      iconBg: 'bg-green-100',
+      iconColor: 'text-green-600',
+      comingSoon: true
+    },
+    {
+      icon: Shield,
+      label: 'Confidentialité',
+      description: 'Politique de confidentialité',
+      path: '/privacy',
+      iconBg: 'bg-purple-100',
+      iconColor: 'text-purple-600',
+      comingSoon: true
+    }
+  ];
+
+  const getInitials = (name) => {
+    if (!name) return 'U';
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 pb-20">
+      {/* Premium Header */}
+      <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-4 pt-8 pb-12 rounded-b-3xl shadow-xl">
+        <div className="flex items-center space-x-4">
+          <div className="w-20 h-20 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center shadow-lg">
+            <span className="text-2xl font-bold text-white">{getInitials(user?.name)}</span>
+          </div>
+          <div className="flex-1">
+            <h1 className="text-2xl font-bold text-white">{user?.name || 'Utilisateur'}</h1>
+            <p className="text-blue-200 text-sm">{user?.email}</p>
+            {user?.address && (
+              <p className="text-blue-300 text-xs mt-1 flex items-center">
+                <MapPin size={12} className="mr-1" /> {user.address}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Stats Cards */}
+      <div className="px-4 -mt-6">
+        <div className="bg-white rounded-2xl shadow-lg p-4 grid grid-cols-3 gap-4">
+          <div className="text-center">
+            <p className="text-2xl font-bold text-orange-600">0</p>
+            <p className="text-xs text-gray-500">Commandes</p>
+          </div>
+          <div className="text-center border-x border-gray-100">
+            <p className="text-2xl font-bold text-blue-600">0</p>
+            <p className="text-xs text-gray-500">En cours</p>
+          </div>
+          <div className="text-center">
+            <p className="text-2xl font-bold text-green-600">0</p>
+            <p className="text-xs text-gray-500">Livrées</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Menu Items */}
+      <div className="px-4 mt-6 space-y-3">
+        {menuItems.map((item) => {
+          const IconComponent = item.icon;
+          return (
+            <button
+              key={item.path}
+              onClick={() => !item.comingSoon && navigate(item.path)}
+              disabled={item.comingSoon}
+              className={`w-full flex items-center p-4 bg-white rounded-2xl shadow-md hover:shadow-lg transition-all ${
+                item.comingSoon ? 'opacity-60 cursor-not-allowed' : 'active:scale-98'
+              }`}
+              data-testid={`menu-${item.path.slice(1)}`}
+            >
+              <div className={`w-12 h-12 ${item.iconBg} rounded-xl flex items-center justify-center`}>
+                <IconComponent size={24} className={item.iconColor} />
+              </div>
+              <div className="flex-1 ml-4 text-left">
+                <div className="flex items-center space-x-2">
+                  <p className="font-semibold text-gray-900">{item.label}</p>
+                  {item.comingSoon && (
+                    <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">
+                      Bientôt
+                    </span>
+                  )}
+                </div>
+                <p className="text-sm text-gray-500">{item.description}</p>
+              </div>
+              <ChevronRight size={20} className="text-gray-400" />
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Logout Button */}
+      <div className="px-4 mt-8">
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center space-x-3 p-4 bg-red-50 hover:bg-red-100 rounded-2xl transition-colors"
+          data-testid="logout-button"
+        >
+          <LogOut size={20} className="text-red-600" />
+          <span className="font-semibold text-red-600">Se Déconnecter</span>
+        </button>
+      </div>
+
+      {/* App Version */}
+      <div className="text-center mt-8">
+        <p className="text-xs text-gray-400">GAZ MAN v1.0.0</p>
+      </div>
+
+      <BottomNav />
+    </div>
+  );
+};
+
+export default Profile;
