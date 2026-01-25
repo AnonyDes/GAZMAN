@@ -13,7 +13,7 @@ import uuid
 from models import (
     User, UserCreate, UserLogin, UserResponse, 
     TokenResponse, ForgotPasswordRequest, ResetPasswordRequest,
-    AddToCartRequest
+    AddToCartRequest, CheckoutRequest, Order, OrderItem
 )
 from auth import (
     verify_password, get_password_hash, 
