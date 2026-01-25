@@ -113,6 +113,11 @@ class Order(OrderBase):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+class AddToCartRequest(BaseModel):
+    product_id: str
+    quantity: int = 1
+    size: str = "medium"
+
 class OrderCreate(BaseModel):
     delivery_address: str
 
