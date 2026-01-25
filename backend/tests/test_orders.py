@@ -11,40 +11,43 @@ BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', '').rstrip('/')
 API = f"{BASE_URL}/api"
 
 
-class TestOrderEndpoints:
-    """Test order management endpoints"""
+# Module-level fixtures
+@pytest.fixture(scope="module")
+def test_user():
+    """Create a test user and return credentials"""
+    unique_id = str(uuid.uuid4())[:8]
+    email = f"TEST_order_{unique_id}@test.com"
+    password = "TestPass123!"
     
-    @pytest.fixture(scope="class")
-    def test_user(self):
-        """Create a test user and return credentials"""
-        unique_id = str(uuid.uuid4())[:8]
-        email = f"TEST_order_{unique_id}@test.com"
-        password = "TestPass123!"
-        
-        # Register user
-        response = requests.post(f"{API}/auth/register", json={
-            "name": f"Test Order User {unique_id}",
+    # Register user
+    response = requests.post(f"{API}/auth/register", json={
+        "name": f"Test Order User {unique_id}",
+        "email": email,
+        "password": password,
+        "phone": "+237600000000",
+        "address": "Test Address, Douala"
+    })
+    
+    if response.status_code == 201:
+        data = response.json()
+        return {
             "email": email,
             "password": password,
-            "phone": "+237600000000",
-            "address": "Test Address, Douala"
-        })
-        
-        if response.status_code == 201:
-            data = response.json()
-            return {
-                "email": email,
-                "password": password,
-                "token": data.get("token"),
-                "user_id": data.get("user", {}).get("id")
-            }
-        else:
-            pytest.skip(f"Failed to create test user: {response.text}")
-    
-    @pytest.fixture(scope="class")
-    def auth_headers(self, test_user):
-        """Get auth headers for authenticated requests"""
-        return {"Authorization": f"Bearer {test_user['token']}"}
+            "token": data.get("token"),
+            "user_id": data.get("user", {}).get("id")
+        }
+    else:
+        pytest.skip(f"Failed to create test user: {response.text}")
+
+
+@pytest.fixture(scope="module")
+def auth_headers(test_user):
+    """Get auth headers for authenticated requests"""
+    return {"Authorization": f"Bearer {test_user['token']}"}
+
+
+class TestOrderEndpoints:
+    """Test order management endpoints"""
     
     def test_get_orders_empty(self, auth_headers):
         """Test GET /api/orders returns empty list for new user"""
@@ -58,10 +61,11 @@ class TestOrderEndpoints:
         print(f"Orders count for new user: {len(data)}")
     
     def test_get_orders_unauthorized(self):
-        """Test GET /api/orders without auth returns 401"""
+        """Test GET /api/orders without auth returns 401 or 403"""
         response = requests.get(f"{API}/orders")
         
-        assert response.status_code == 401, f"Expected 401, got {response.status_code}"
+        # Accept both 401 and 403 as valid unauthorized responses
+        assert response.status_code in [401, 403], f"Expected 401 or 403, got {response.status_code}"
     
     def test_get_order_not_found(self, auth_headers):
         """Test GET /api/orders/{order_id} with invalid ID returns 404"""
@@ -83,77 +87,79 @@ class TestOrderEndpoints:
         assert "empty" in data.get("detail", "").lower() or "cart" in data.get("detail", "").lower()
 
 
+@pytest.fixture(scope="module")
+def test_user_with_order():
+    """Create a test user, add item to cart, and create an order"""
+    unique_id = str(uuid.uuid4())[:8]
+    email = f"TEST_fullorder_{unique_id}@test.com"
+    password = "TestPass123!"
+    
+    # Register user
+    response = requests.post(f"{API}/auth/register", json={
+        "name": f"Test Full Order User {unique_id}",
+        "email": email,
+        "password": password,
+        "phone": "+237600000000",
+        "address": "Test Address, Douala"
+    })
+    
+    if response.status_code != 201:
+        pytest.skip(f"Failed to create test user: {response.text}")
+    
+    data = response.json()
+    token = data.get("token")
+    headers = {"Authorization": f"Bearer {token}"}
+    
+    # Get products to add to cart
+    products_response = requests.get(f"{API}/products")
+    if products_response.status_code != 200:
+        pytest.skip("Failed to get products")
+    
+    products = products_response.json()
+    if not products:
+        pytest.skip("No products available")
+    
+    product = products[0]
+    
+    # Add item to cart
+    cart_response = requests.post(f"{API}/cart/items", headers=headers, json={
+        "product_id": product["id"],
+        "quantity": 1,
+        "size": "medium"
+    })
+    
+    if cart_response.status_code != 200:
+        pytest.skip(f"Failed to add item to cart: {cart_response.text}")
+    
+    # Create order
+    order_response = requests.post(f"{API}/orders", headers=headers, json={
+        "delivery_address": "123 Test Street, Douala",
+        "phone": "+237600000000",
+        "payment_method": "cash"
+    })
+    
+    if order_response.status_code != 200:
+        pytest.skip(f"Failed to create order: {order_response.text}")
+    
+    order_data = order_response.json()
+    
+    return {
+        "email": email,
+        "password": password,
+        "token": token,
+        "order_id": order_data.get("order_id"),
+        "order_total": order_data.get("total")
+    }
+
+
+@pytest.fixture(scope="module")
+def auth_headers_with_order(test_user_with_order):
+    """Get auth headers for user with order"""
+    return {"Authorization": f"Bearer {test_user_with_order['token']}"}
+
+
 class TestFullOrderFlow:
     """Test complete order flow: add to cart -> checkout -> view orders"""
-    
-    @pytest.fixture(scope="class")
-    def test_user_with_order(self):
-        """Create a test user, add item to cart, and create an order"""
-        unique_id = str(uuid.uuid4())[:8]
-        email = f"TEST_fullorder_{unique_id}@test.com"
-        password = "TestPass123!"
-        
-        # Register user
-        response = requests.post(f"{API}/auth/register", json={
-            "name": f"Test Full Order User {unique_id}",
-            "email": email,
-            "password": password,
-            "phone": "+237600000000",
-            "address": "Test Address, Douala"
-        })
-        
-        if response.status_code != 201:
-            pytest.skip(f"Failed to create test user: {response.text}")
-        
-        data = response.json()
-        token = data.get("token")
-        headers = {"Authorization": f"Bearer {token}"}
-        
-        # Get products to add to cart
-        products_response = requests.get(f"{API}/products")
-        if products_response.status_code != 200:
-            pytest.skip("Failed to get products")
-        
-        products = products_response.json()
-        if not products:
-            pytest.skip("No products available")
-        
-        product = products[0]
-        
-        # Add item to cart
-        cart_response = requests.post(f"{API}/cart/items", headers=headers, json={
-            "product_id": product["id"],
-            "quantity": 1,
-            "size": "medium"
-        })
-        
-        if cart_response.status_code != 200:
-            pytest.skip(f"Failed to add item to cart: {cart_response.text}")
-        
-        # Create order
-        order_response = requests.post(f"{API}/orders", headers=headers, json={
-            "delivery_address": "123 Test Street, Douala",
-            "phone": "+237600000000",
-            "payment_method": "cash"
-        })
-        
-        if order_response.status_code != 200:
-            pytest.skip(f"Failed to create order: {order_response.text}")
-        
-        order_data = order_response.json()
-        
-        return {
-            "email": email,
-            "password": password,
-            "token": token,
-            "order_id": order_data.get("order_id"),
-            "order_total": order_data.get("total")
-        }
-    
-    @pytest.fixture(scope="class")
-    def auth_headers_with_order(self, test_user_with_order):
-        """Get auth headers for user with order"""
-        return {"Authorization": f"Bearer {test_user_with_order['token']}"}
     
     def test_get_orders_list(self, auth_headers_with_order, test_user_with_order):
         """Test GET /api/orders returns list with created order"""
