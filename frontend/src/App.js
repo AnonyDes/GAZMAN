@@ -93,6 +93,14 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
           
           {/* Default route - redirect to home */}
           <Route path="/" element={<Navigate to="/home" replace />} />
