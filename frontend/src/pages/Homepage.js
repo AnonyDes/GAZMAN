@@ -22,13 +22,8 @@ const Homepage = () => {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, productsRes] = await Promise.all([
-        axios.get(`${API}/categories`),
-        axios.get(`${API}/products?limit=6`)
-      ]);
-      
+      const categoriesRes = await axios.get(`${API}/categories`);
       setCategories(categoriesRes.data.categories);
-      setPopularProducts(productsRes.data);
       setLoading(false);
     } catch (error) {
       console.error('Error fetching data:', error);
