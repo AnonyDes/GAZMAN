@@ -51,7 +51,7 @@ class ProductBase(BaseModel):
     category: Literal["domestic", "industrial", "refill", "rental", "installation", "emergency"]
     size: Literal["small", "medium", "large"]
     capacity: str  # e.g., "7.5L", "12kg", "15kg"
-    price: float
+    price: int  # Price in XAF (FCFA) - integer, no decimals
     stock: int
     image_url: str
     description: str
