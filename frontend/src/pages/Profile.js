@@ -130,15 +130,15 @@ const Profile = () => {
       <div className="px-4 -mt-6">
         <div className="bg-white rounded-2xl shadow-lg p-4 grid grid-cols-3 gap-4">
           <div className="text-center">
-            <p className="text-2xl font-bold text-orange-600">0</p>
+            <p className="text-2xl font-bold text-orange-600" data-testid="stats-total">{orderStats.total}</p>
             <p className="text-xs text-gray-500">Commandes</p>
           </div>
           <div className="text-center border-x border-gray-100">
-            <p className="text-2xl font-bold text-blue-600">0</p>
+            <p className="text-2xl font-bold text-blue-600" data-testid="stats-in-progress">{orderStats.inProgress}</p>
             <p className="text-xs text-gray-500">En cours</p>
           </div>
           <div className="text-center">
-            <p className="text-2xl font-bold text-green-600">0</p>
+            <p className="text-2xl font-bold text-green-600" data-testid="stats-delivered">{orderStats.delivered}</p>
             <p className="text-xs text-gray-500">Livrées</p>
           </div>
         </div>
