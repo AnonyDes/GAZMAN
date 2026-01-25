@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import axios from 'axios';
 import { 
   Package, 
   MapPin, 
-  Phone, 
   LogOut, 
-  ChevronRight, 
-  User,
+  ChevronRight,
   Settings,
   HelpCircle,
   Shield
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
+
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, token, logout } = useAuth();
+  const [orderStats, setOrderStats] = useState({ total: 0, inProgress: 0, delivered: 0 });
+
+  useEffect(() => {
+    const fetchOrderStats = async () => {
+      try {
+        const response = await axios.get(`${API}/orders`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const orders = response.data;
+        const total = orders.length;
+        const inProgress = orders.filter(o => ['en_attente', 'en_preparation', 'en_livraison'].includes(o.status)).length;
+        const delivered = orders.filter(o => o.status === 'livree').length;
+        setOrderStats({ total, inProgress, delivered });
+      } catch (error) {
+        console.error('Error fetching order stats:', error);
+      }
+    };
+    
+    if (token) {
+      fetchOrderStats();
+    }
+  }, [token]);
 
   const handleLogout = () => {
     if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
