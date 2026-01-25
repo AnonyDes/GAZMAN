@@ -126,6 +126,10 @@ class AddToCartRequest(BaseModel):
     quantity: int = 1
     size: str = "medium"
 
+class UpdateCartRequest(BaseModel):
+    quantity: int
+    size: str = "medium"
+
 # Delivery Models
 class Location(BaseModel):
     lat: float
