@@ -12,7 +12,8 @@ import uuid
 # Import local modules
 from models import (
     User, UserCreate, UserLogin, UserResponse, 
-    TokenResponse, ForgotPasswordRequest, ResetPasswordRequest
+    TokenResponse, ForgotPasswordRequest, ResetPasswordRequest,
+    AddToCartRequest
 )
 from auth import (
     verify_password, get_password_hash, 
