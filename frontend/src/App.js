@@ -8,6 +8,7 @@ import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import Homepage from '@/pages/Homepage';
 import ProductCatalog from '@/pages/ProductCatalog';
+import ProductDetail from '@/pages/ProductDetail';
 import '@/App.css';
 
 function App() {
@@ -35,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ProductCatalog />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:productId"
+            element={
+              <ProtectedRoute>
+                <ProductDetail />
               </ProtectedRoute>
             }
           />
