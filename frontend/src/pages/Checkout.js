@@ -167,19 +167,25 @@ const Checkout = () => {
               </div>
               <h2 className="text-lg font-bold text-gray-900">Téléphone</h2>
             </div>
-            <input
-              type="tel"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              placeholder="+237 6 XX XX XX XX"
-              className={`w-full px-4 py-3 border-2 ${errors.phone ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none`}
-              data-testid="phone-input"
-            />
+            <div className="flex items-center space-x-2">
+              <div className="bg-gray-100 px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-gray-700">
+                +237
+              </div>
+              <input
+                type="tel"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder="6 XX XX XX XX"
+                maxLength="11"
+                className={`flex-1 px-4 py-3 border-2 ${errors.phone ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none`}
+                data-testid="phone-input"
+              />
+            </div>
             {errors.phone && (
               <p className="text-red-500 text-sm mt-2">{errors.phone}</p>
             )}
-            <p className="text-gray-500 text-xs mt-2">Format Cameroun: +237 6/9 XX XX XX XX</p>
+            <p className="text-gray-500 text-xs mt-2">Entrez votre numéro sans le code pays</p>
           </div>
 
           {/* Payment Method */}
