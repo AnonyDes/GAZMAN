@@ -10,6 +10,7 @@ import Homepage from '@/pages/Homepage';
 import ProductCatalog from '@/pages/ProductCatalog';
 import ProductDetail from '@/pages/ProductDetail';
 import ShoppingCart from '@/pages/ShoppingCart';
+import Checkout from '@/pages/Checkout';
 import '@/App.css';
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ShoppingCart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
               </ProtectedRoute>
             }
           />
