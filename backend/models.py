@@ -96,14 +96,14 @@ class OrderItem(BaseModel):
     product_name: str
     quantity: int
     size: str
-    price: float
+    price: int  # XAF
 
 class OrderBase(BaseModel):
     user_id: str
     items: List[OrderItem]
-    subtotal: float
-    delivery_fee: float = 5.50
-    total: float
+    subtotal: int  # XAF
+    delivery_fee: int = 3500  # 3,500 FCFA
+    total: int  # XAF
     delivery_address: str
     status: Literal["pending", "confirmed", "in_progress", "delivered", "cancelled"] = "pending"
 
