@@ -570,6 +570,158 @@ async def update_profile(
     return UserResponse(**updated_user)
 
 # ============================================
+# Address Endpoints
+# ============================================
+
+@api_router.get("/addresses")
+async def get_addresses(current_user: User = Depends(get_current_user)):
+    """Get all addresses for current user."""
+    addresses = await db.addresses.find(
+        {"user_id": current_user.id},
+        {"_id": 0}
+    ).sort("created_at", -1).to_list(50)
+    return addresses
+
+@api_router.post("/addresses", status_code=status.HTTP_201_CREATED)
+async def create_address(
+    address_data: AddressCreate,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a new address."""
+    # If this is set as default, unset other defaults
+    if address_data.is_default:
+        await db.addresses.update_many(
+            {"user_id": current_user.id},
+            {"$set": {"is_default": False}}
+        )
+    
+    # Check if user has no addresses, make this one default
+    existing_count = await db.addresses.count_documents({"user_id": current_user.id})
+    if existing_count == 0:
+        address_data.is_default = True
+    
+    address = Address(
+        **address_data.model_dump(),
+        user_id=current_user.id
+    )
+    
+    address_dict = address.model_dump()
+    address_dict['created_at'] = address_dict['created_at'].isoformat()
+    await db.addresses.insert_one(address_dict)
+    
+    return {"message": "Address created successfully", "id": address.id}
+
+@api_router.get("/addresses/{address_id}")
+async def get_address(
+    address_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get a single address by ID."""
+    address = await db.addresses.find_one(
+        {"id": address_id, "user_id": current_user.id},
+        {"_id": 0}
+    )
+    if not address:
+        raise HTTPException(status_code=404, detail="Address not found")
+    return address
+
+@api_router.put("/addresses/{address_id}")
+async def update_address(
+    address_id: str,
+    address_data: AddressUpdate,
+    current_user: User = Depends(get_current_user)
+):
+    """Update an existing address."""
+    # Check if address exists and belongs to user
+    existing = await db.addresses.find_one(
+        {"id": address_id, "user_id": current_user.id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
+    # If setting as default, unset other defaults
+    if address_data.is_default:
+        await db.addresses.update_many(
+            {"user_id": current_user.id, "id": {"$ne": address_id}},
+            {"$set": {"is_default": False}}
+        )
+    
+    # Build update dict with only provided fields
+    update_dict = {k: v for k, v in address_data.model_dump().items() if v is not None}
+    
+    if update_dict:
+        await db.addresses.update_one(
+            {"id": address_id, "user_id": current_user.id},
+            {"$set": update_dict}
+        )
+    
+    # Get updated address
+    updated = await db.addresses.find_one(
+        {"id": address_id, "user_id": current_user.id},
+        {"_id": 0}
+    )
+    return updated
+
+@api_router.delete("/addresses/{address_id}")
+async def delete_address(
+    address_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Delete an address."""
+    # Check if address exists
+    existing = await db.addresses.find_one(
+        {"id": address_id, "user_id": current_user.id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
+    was_default = existing.get("is_default", False)
+    
+    # Delete the address
+    await db.addresses.delete_one({"id": address_id, "user_id": current_user.id})
+    
+    # If deleted address was default, set another one as default
+    if was_default:
+        remaining = await db.addresses.find_one(
+            {"user_id": current_user.id},
+            {"_id": 0}
+        )
+        if remaining:
+            await db.addresses.update_one(
+                {"id": remaining["id"]},
+                {"$set": {"is_default": True}}
+            )
+    
+    return {"message": "Address deleted successfully"}
+
+@api_router.post("/addresses/{address_id}/set-default")
+async def set_default_address(
+    address_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Set an address as the default."""
+    # Check if address exists
+    existing = await db.addresses.find_one(
+        {"id": address_id, "user_id": current_user.id}
+    )
+    if not existing:
+        raise HTTPException(status_code=404, detail="Address not found")
+    
+    # Unset all other defaults
+    await db.addresses.update_many(
+        {"user_id": current_user.id},
+        {"$set": {"is_default": False}}
+    )
+    
+    # Set this one as default
+    await db.addresses.update_one(
+        {"id": address_id},
+        {"$set": {"is_default": True}}
+    )
+    
+    return {"message": "Address set as default"}
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
