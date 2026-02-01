@@ -1022,6 +1022,154 @@ async def admin_get_stats(admin: User = Depends(get_admin_user)):
     }
 
 # ============================================
+# Driver Endpoints
+# ============================================
+
+async def get_driver_user(current_user: User = Depends(get_current_user)):
+    """Dependency to verify driver role."""
+    if current_user.role != "driver":
+        raise HTTPException(status_code=403, detail="Driver access required")
+    return current_user
+
+# Failure reasons for delivery
+FAILURE_REASONS = [
+    {"code": "client_absent", "fr": "Client absent", "en": "Client absent"},
+    {"code": "adresse_incorrecte", "fr": "Adresse incorrecte / introuvable", "en": "Incorrect / unfound address"},
+    {"code": "client_refuse", "fr": "Client a refusé", "en": "Client refused"},
+    {"code": "stock_indisponible", "fr": "Problème de stock / produit indisponible", "en": "Stock issue / product unavailable"},
+    {"code": "probleme_vehicule", "fr": "Problème véhicule / incident", "en": "Vehicle problem / incident"},
+    {"code": "autre", "fr": "Autre", "en": "Other"},
+]
+
+@api_router.get("/driver/failure-reasons")
+async def get_failure_reasons(driver: User = Depends(get_driver_user)):
+    """Get predefined delivery failure reasons."""
+    return {"reasons": FAILURE_REASONS}
+
+@api_router.get("/driver/orders")
+async def driver_get_orders(
+    status: Optional[str] = None,
+    driver: User = Depends(get_driver_user)
+):
+    """Get orders assigned to the current driver."""
+    query = {"driver_id": driver.id}
+    if status:
+        query["status"] = status
+    
+    orders = await db.orders.find(query, {"_id": 0}).sort("created_at", -1).to_list(100)
+    
+    # Enrich with customer info
+    for order in orders:
+        customer = await db.users.find_one(
+            {"id": order["user_id"]}, 
+            {"_id": 0, "password_hash": 0, "name": 1, "email": 1}
+        )
+        order["customer"] = customer
+    
+    # Count by status
+    stats = {
+        "total": len(orders),
+        "pending": len([o for o in orders if o["status"] == "en_attente"]),
+        "preparing": len([o for o in orders if o["status"] == "en_preparation"]),
+        "delivering": len([o for o in orders if o["status"] == "en_livraison"]),
+        "delivered": len([o for o in orders if o["status"] == "livree"]),
+        "failed": len([o for o in orders if o["status"] == "echouee"]),
+    }
+    
+    return {"orders": orders, "stats": stats}
+
+@api_router.get("/driver/orders/{order_id}")
+async def driver_get_order(
+    order_id: str,
+    driver: User = Depends(get_driver_user)
+):
+    """Get single order details (driver only sees assigned orders)."""
+    order = await db.orders.find_one(
+        {"id": order_id, "driver_id": driver.id}, 
+        {"_id": 0}
+    )
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found or not assigned to you")
+    
+    # Enrich with customer info
+    customer = await db.users.find_one(
+        {"id": order["user_id"]}, 
+        {"_id": 0, "password_hash": 0}
+    )
+    order["customer"] = customer
+    
+    return order
+
+@api_router.put("/driver/orders/{order_id}/status")
+async def driver_update_order_status(
+    order_id: str,
+    status_update: dict,
+    driver: User = Depends(get_driver_user)
+):
+    """Update order status (driver only for assigned orders)."""
+    # Get the current order
+    order = await db.orders.find_one({"id": order_id, "driver_id": driver.id})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found or not assigned to you")
+    
+    current_status = order["status"]
+    new_status = status_update.get("status")
+    failure_reason = status_update.get("failure_reason")
+    failure_details = status_update.get("failure_details")
+    
+    # Define valid status transitions for drivers
+    valid_transitions = {
+        "en_attente": ["en_preparation"],
+        "en_preparation": ["en_livraison"],
+        "en_livraison": ["livree", "echouee"],
+    }
+    
+    # Check if transition is valid
+    allowed = valid_transitions.get(current_status, [])
+    if new_status not in allowed:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Cannot change status from '{current_status}' to '{new_status}'. Allowed: {allowed}"
+        )
+    
+    # Build update
+    update_data = {"status": new_status}
+    
+    # Handle failure case
+    if new_status == "echouee":
+        if not failure_reason:
+            raise HTTPException(status_code=400, detail="Failure reason is required")
+        
+        valid_reason_codes = [r["code"] for r in FAILURE_REASONS]
+        if failure_reason not in valid_reason_codes:
+            raise HTTPException(status_code=400, detail=f"Invalid failure reason. Must be one of: {valid_reason_codes}")
+        
+        update_data["failure_reason"] = failure_reason
+        if failure_reason == "autre" and failure_details:
+            update_data["failure_details"] = failure_details
+    
+    await db.orders.update_one({"id": order_id}, {"$set": update_data})
+    
+    return {"message": "Order status updated", "new_status": new_status}
+
+@api_router.get("/driver/stats")
+async def driver_get_stats(driver: User = Depends(get_driver_user)):
+    """Get driver statistics."""
+    orders = await db.orders.find({"driver_id": driver.id}, {"_id": 0, "status": 1, "total": 1}).to_list(1000)
+    
+    delivered = [o for o in orders if o["status"] == "livree"]
+    failed = [o for o in orders if o["status"] == "echouee"]
+    in_progress = [o for o in orders if o["status"] in ["en_attente", "en_preparation", "en_livraison"]]
+    
+    return {
+        "total_assigned": len(orders),
+        "delivered": len(delivered),
+        "failed": len(failed),
+        "in_progress": len(in_progress),
+        "total_delivered_value": sum(o["total"] for o in delivered)
+    }
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
