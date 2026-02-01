@@ -129,7 +129,7 @@ function App() {
             <Route
               path="/admin"
               element={
-                <ProtectedRoute>
+                <ProtectedRoute allowedRoles={['admin']}>
                   <AdminLayout />
                 </ProtectedRoute>
               }
@@ -139,6 +139,20 @@ function App() {
               <Route path="orders/:orderId" element={<AdminOrderDetails />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="users" element={<AdminUsers />} />
+            </Route>
+            
+            {/* Driver Routes */}
+            <Route
+              path="/driver"
+              element={
+                <ProtectedRoute allowedRoles={['driver']}>
+                  <DriverLayout />
+                </ProtectedRoute>
+              }
+            >
+              <Route index element={<DriverDashboard />} />
+              <Route path="orders" element={<DriverOrders />} />
+              <Route path="orders/:orderId" element={<DriverOrderDetails />} />
             </Route>
             
             {/* Default route - redirect to home */}
