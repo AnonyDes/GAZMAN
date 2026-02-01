@@ -30,51 +30,64 @@ const Checkout = () => {
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
-    fetchCart();
-    fetchAddresses();
-  }, []);
-
-  const fetchCart = async () => {
-    try {
-      const response = await axios.get(`${API}/cart`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      if (!response.data.items || response.data.items.length === 0) {
+    const loadData = async () => {
+      // Fetch cart
+      try {
+        const cartResponse = await axios.get(`${API}/cart`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (!cartResponse.data.items || cartResponse.data.items.length === 0) {
+          navigate('/cart');
+          return;
+        }
+        
+        setCart(cartResponse.data);
+      } catch (error) {
+        console.error('Error fetching cart:', error);
         navigate('/cart');
         return;
+      } finally {
+        setLoading(false);
       }
-      
-      setCart(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error('Error fetching cart:', error);
-      setLoading(false);
-      navigate('/cart');
-    }
-  };
 
-  const fetchAddresses = async () => {
-    try {
-      const response = await axios.get(`${API}/addresses`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setSavedAddresses(response.data);
-      
-      // Auto-select default address
-      const defaultAddr = response.data.find(a => a.is_default);
-      if (defaultAddr) {
-        selectAddress(defaultAddr);
-      } else if (response.data.length > 0) {
-        selectAddress(response.data[0]);
-      } else {
+      // Fetch addresses
+      try {
+        const addrResponse = await axios.get(`${API}/addresses`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        setSavedAddresses(addrResponse.data);
+        
+        // Auto-select default address
+        const defaultAddr = addrResponse.data.find(a => a.is_default);
+        if (defaultAddr) {
+          setSelectedAddressId(defaultAddr.id);
+          setFormData(prev => ({
+            ...prev,
+            delivery_address: `${defaultAddr.quartier}, ${defaultAddr.city}${defaultAddr.description ? ` - ${defaultAddr.description}` : ''}`,
+            phone: defaultAddr.phone.replace('+237 ', '').replace('+237', '')
+          }));
+          setUseNewAddress(false);
+        } else if (addrResponse.data.length > 0) {
+          const firstAddr = addrResponse.data[0];
+          setSelectedAddressId(firstAddr.id);
+          setFormData(prev => ({
+            ...prev,
+            delivery_address: `${firstAddr.quartier}, ${firstAddr.city}${firstAddr.description ? ` - ${firstAddr.description}` : ''}`,
+            phone: firstAddr.phone.replace('+237 ', '').replace('+237', '')
+          }));
+          setUseNewAddress(false);
+        } else {
+          setUseNewAddress(true);
+        }
+      } catch (error) {
+        console.error('Error fetching addresses:', error);
         setUseNewAddress(true);
       }
-    } catch (error) {
-      console.error('Error fetching addresses:', error);
-      setUseNewAddress(true);
-    }
-  };
+    };
+
+    loadData();
+  }, [token, navigate]);
 
   const selectAddress = (address) => {
     setSelectedAddressId(address.id);
