@@ -1,4 +1,13 @@
-"""Create an admin user for testing."""
+"""
+Create an admin user for development/testing.
+
+⚠️ DEV ONLY - DO NOT USE IN PRODUCTION ⚠️
+
+For production:
+1. Set ADMIN_EMAIL and ADMIN_DEFAULT_PASSWORD in environment variables
+2. Change the password immediately after first login
+3. Consider using a more secure admin creation process
+"""
 import asyncio
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
@@ -18,15 +27,19 @@ async def create_admin_user():
     client = AsyncIOMotorClient(mongo_url)
     db = client[os.environ['DB_NAME']]
     
-    admin_email = "admin@gazman.cm"
-    admin_password = "Admin123!"
+    # Get credentials from environment variables
+    admin_email = os.environ.get('ADMIN_EMAIL', 'admin@gazman.cm')
+    admin_password = os.environ.get('ADMIN_DEFAULT_PASSWORD', 'CHANGE_ME_IN_PRODUCTION')
+    
+    print("⚠️  DEV ONLY - Default admin credentials should be changed in production!")
+    print(f"   Using ADMIN_EMAIL from env: {admin_email}")
     
     try:
         # Check if admin already exists
         existing = await db.users.find_one({"email": admin_email})
         if existing:
             print(f"✅ Admin user already exists: {admin_email}")
-            print(f"   Password: {admin_password}")
+            print("   To reset password, delete the user from DB and re-run this script.")
             return
         
         # Create admin user
@@ -45,7 +58,7 @@ async def create_admin_user():
         await db.users.insert_one(admin_user)
         print(f"✅ Admin user created successfully!")
         print(f"   Email: {admin_email}")
-        print(f"   Password: {admin_password}")
+        print("   ⚠️  IMPORTANT: Change the default password immediately after first login!")
         
     except Exception as e:
         print(f"❌ Error creating admin user: {e}")
@@ -54,4 +67,5 @@ async def create_admin_user():
 
 if __name__ == "__main__":
     print("🔐 Creating admin user...")
+    print("=" * 50)
     asyncio.run(create_admin_user())
