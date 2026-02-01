@@ -31,9 +31,21 @@ Build a full-stack e-commerce application named "GAZ MAN" for selling gas cylind
 - [x] Payment method selection (MOCKED - cash, mobile money, card)
 - [x] Order creation API
 - [x] Order success/confirmation page
-- [x] **My Orders page** - List all user orders with status badges
-- [x] **Order Details page** - Full order info with tracking timeline
-- [x] **Profile page** - User info, dynamic order stats, menu navigation
+- [x] My Orders page - List all user orders with status badges
+- [x] Order Details page - Full order info with tracking timeline
+- [x] Profile page - User info, dynamic order stats, menu navigation
+
+### Phase 3.5 - Polish Pass ✅
+- [x] **Address Management (Mes Adresses)**: Full CRUD for delivery addresses
+  - Add/Edit/Delete addresses
+  - Set default address
+  - Address fields: name, city, quartier, description, phone
+- [x] **Checkout Integration**: Auto-fill from saved addresses, address picker
+- [x] **Language Support (i18n)**: French/English toggle via LanguageContext
+  - UI labels, buttons, status messages translated
+  - Default language: French
+- [x] **FCFA Formatting**: Verified consistent across all pages (no $, no decimals)
+- [x] **Product Images**: Updated seed data with gas cylinder stock photos
 
 ### Order Status Timeline
 The app supports 5 order statuses:
@@ -58,7 +70,11 @@ The app supports 5 order statuses:
 | POST | /api/orders | Create order from cart |
 | GET | /api/orders | Get user's orders |
 | GET | /api/orders/{id} | Get order details |
-| GET | /api/profile | Get user profile |
+| GET | /api/addresses | Get user's saved addresses |
+| POST | /api/addresses | Create new address |
+| PUT | /api/addresses/{id} | Update address |
+| DELETE | /api/addresses/{id} | Delete address |
+| POST | /api/addresses/{id}/set-default | Set address as default |
 
 ## Database Schema
 ```
@@ -66,6 +82,7 @@ users: {id, name, email, password_hash, role, address, state, language, created_
 products: {id, name, brand, price, stock, image_url, description, category, capacity, rating, delivery_time}
 carts: {user_id, items: [{product_id, product_name, product_image, quantity, size, price}], updated_at}
 orders: {id, user_id, items, subtotal, delivery_fee, total, delivery_address, phone, payment_method, status, created_at}
+addresses: {id, user_id, name, city, quartier, description, phone, is_default, created_at}
 ```
 
 ## File Structure
@@ -85,7 +102,8 @@ orders: {id, user_id, items, subtotal, delivery_fee, total, delivery_address, ph
         │   ├── ProtectedRoute.js
         │   └── ui/           # Shadcn components
         ├── contexts/
-        │   └── AuthContext.js
+        │   ├── AuthContext.js
+        │   └── LanguageContext.js   # i18n support
         ├── pages/
         │   ├── Homepage.js
         │   ├── ProductCatalog.js
@@ -96,6 +114,7 @@ orders: {id, user_id, items, subtotal, delivery_fee, total, delivery_address, ph
         │   ├── MyOrders.js
         │   ├── OrderDetails.js
         │   ├── Profile.js
+        │   ├── MyAddresses.js       # Address management
         │   └── (Auth pages)
         ├── utils/
         │   └── currency.js
@@ -115,16 +134,14 @@ orders: {id, user_id, items, subtotal, delivery_fee, total, delivery_address, ph
 - [ ] Real payment integration (Orange Money, MTN Mobile Money, etc.)
 
 ### P2 - Medium Priority
-- [ ] User address management (Mes Adresses page)
-- [ ] User settings/preferences
 - [ ] Push notifications for order status updates
 - [ ] Real-time delivery tracking with maps
+- [ ] User settings/preferences page
 
 ### P3 - Low Priority
 - [ ] Help & Support page
 - [ ] Privacy policy page
-- [ ] Update product images to actual gas cylinder photos
-- [ ] Multi-language support (full French/English toggle)
+- [ ] Full product content translation (names, descriptions)
 
 ## Test Reports
 - `/app/test_reports/iteration_1.json` - Cart operations testing
