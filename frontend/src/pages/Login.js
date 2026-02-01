@@ -33,7 +33,15 @@ const Login = () => {
     setLoading(false);
 
     if (result.success) {
-      navigate('/');
+      // Navigate based on user role
+      const userRole = result.user?.role || 'client';
+      if (userRole === 'admin') {
+        navigate('/admin');
+      } else if (userRole === 'driver') {
+        navigate('/driver');
+      } else {
+        navigate('/home');
+      }
     } else {
       setError(result.error);
     }
