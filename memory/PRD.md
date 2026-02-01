@@ -64,9 +64,15 @@ The app supports 5 order statuses:
 4. `livree` - Livrée (Delivered)
 5. `annulee` - Annulée (Cancelled)
 
-## Admin Credentials
-- **Email**: admin@gazman.cm
-- **Password**: Admin123!
+## Admin Access
+Admin credentials are configured via environment variables:
+- `ADMIN_EMAIL` - Admin email address
+- `ADMIN_DEFAULT_PASSWORD` - Initial password (⚠️ change immediately after first login)
+
+To create an admin user, run:
+```bash
+cd /app/backend && python create_admin.py
+```
 
 ## Key API Endpoints
 
