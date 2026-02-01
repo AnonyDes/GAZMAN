@@ -213,24 +213,22 @@ const translations = {
 export const LanguageProvider = ({ children }) => {
   const { user } = useAuth();
   
-  // Initialize language from user preference or localStorage
-  const getInitialLanguage = () => {
-    if (user?.language) return user.language;
+  // Initialize from localStorage first (sync), then update from user if available
+  const [language, setLanguageState] = useState(() => {
     const savedLang = localStorage.getItem('gaz_man_language');
     return savedLang || 'fr';
-  };
-  
-  const [language, setLanguage] = useState(getInitialLanguage);
+  });
 
-  // Update language when user changes
+  // Update language when user preference changes
   useEffect(() => {
-    if (user?.language && user.language !== language) {
-      setLanguage(user.language);
+    if (user?.language) {
+      setLanguageState(user.language);
+      localStorage.setItem('gaz_man_language', user.language);
     }
-  }, [user, language]);
+  }, [user?.language]);
 
-  const changeLanguage = (lang) => {
-    setLanguage(lang);
+  const setLanguage = (lang) => {
+    setLanguageState(lang);
     localStorage.setItem('gaz_man_language', lang);
   };
 
@@ -246,7 +244,7 @@ export const LanguageProvider = ({ children }) => {
 
   const value = {
     language,
-    setLanguage: changeLanguage,
+    setLanguage,
     t,
     isEnglish: language === 'en',
     isFrench: language === 'fr'
