@@ -7,7 +7,7 @@ import requests
 import os
 import uuid
 
-BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://gas-cylinder-shop.preview.emergentagent.com')
+BASE_URL = os.environ.get('REACT_APP_BACKEND_URL', 'https://driver-app-phase4.preview.emergentagent.com')
 
 # Test product ID from the database
 TEST_PRODUCT_ID = "c18e85b9-c66d-458c-bf1d-b0f05c864ded"  # Cylinder Refill Service

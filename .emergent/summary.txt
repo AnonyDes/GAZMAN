@@ -1,147 +1,150 @@
 <analysis>**original_problem_statement**: The user wants to build a full-stack e-commerce application named GAZ MAN for selling gas cylinders and related services. The user provided four detailed specification documents (cahier de charges) in French and requested that the UI be matched exactly. The project is to be built incrementally in phases, starting with a client-facing MVP.
 
-**PRODUCT REQUIREMENTS (MVP - Phases 1, 2, 3)**:
-1.  **Authentication**: Standard email/password registration, login, and password reset.
+**PRODUCT REQUIREMENTS**:
+1.  **Authentication**: Standard email/password registration, login, and password reset for different roles (client, admin, driver).
 2.  **Core Shopping**: Browse a catalog of gas products, search, filter, view product details, and add items to a shopping cart.
-3.  **Checkout Flow**: A complete checkout process including delivery address, phone number, mock payment selection, and order confirmation.
-4.  **Order Management**: Users must be able to view their order history and the status of each order.
-5.  **Delivery Tracking**: A page showing the delivery status and a simulated real-time map of the delivery.
-6.  **UI/UX**: A premium, modern, mobile-first design inspired by the GOZEM app, using a Dark Blue/Orange/White color scheme.
-7.  **Currency**: All prices must be in Cameroon's currency (XAF) and formatted as FCFA (e.g., 12 000 FCFA).
+3.  **Checkout Flow**: A complete checkout process including delivery address management (CRUD, default selection), mock payment, and order confirmation.
+4.  **Order Management (Client)**: Users must be able to view their order history and the status of each order.
+5.  **Delivery Tracking (Client)**: A page showing the delivery status and a simulated real-time map of the delivery.
+6.  **Admin Dashboard (Phase 5)**: A dashboard for admins to manage orders (view, update status, assign drivers), products (CRUD), and users (view).
+7.  **Driver App (Phase 4)**: A mobile-first interface for drivers to view assigned orders and update their status.
+8.  **UI/UX**: A premium, modern, mobile-first design inspired by the GOZEM app, using a Dark Blue/Orange/White color scheme.
+9.  **Currency**: All prices must be in Cameroon's currency (XAF) and formatted as FCFA (e.g., 12 000 FCFA).
+10. **Internationalization (i18n)**: UI labels and statuses should be togglable between English and French.
 
-**User's preferred language**: English for conversation, but all UI text and content should be in **French**.
+**User's preferred language**: English for conversation, but all UI text and content must be in **French** by default, with an option to switch to English.
 
 **what currently exists?**
-A full-stack application with a React frontend and a FastAPI backend.
--   **Backend**: Features fully implemented and tested via  for authentication (JWT), product catalog, cart management (add, view, update), and order creation/retrieval. Product data is seeded into a MongoDB database.
--   **Frontend**: The UI is substantially complete for the MVP. This includes authentication pages, a redesigned GOZEM-style homepage acting as a service gateway, redesigned product catalog and detail pages, a shopping cart, a checkout page with a prefixed Cameroon phone number input, and an order success page. All prices are correctly formatted in FCFA.
+A full-stack application with a React frontend and a FastAPI backend, supporting three user roles: client, admin, and driver.
+-   **Backend**: Features are implemented for JWT authentication (with roles), product catalog, cart management, order creation, full address management (CRUD, set default), a complete admin panel API (stats, order/product/user management, driver assignment), and driver-specific APIs (view assigned orders, update status). Security has been hardened by moving credentials to  files and adding a password change endpoint.
+-   **Frontend**:
+    -   **Client App**: All MVP features are complete, including auth, shopping, checkout with address selection, order history/details, and a profile page.
+    -   **i18n**: A language context () provides EN/FR translations, with a toggle switch on the Profile page that persists the user's choice in .
+    -   **Admin App**: A complete set of pages under a protected  route allows for managing orders, products, and users. It includes a warning banner for preview environments.
+    -   **Driver App**: The foundational pages (, , ) have been created.
 
 **Last working item**:
--   **Last item agent was working**: The user reported that deleting an item from the shopping cart is not working. The agent started investigating the backend code to diagnose the issue.
+-   **Last item agent was working**: The agent was in the process of building the frontend for the **Phase 4 Delivery Driver App**. The last action was creating the  page, and the next step was to create the  page.
 -   **Status**: IN PROGRESS
--   **Agent Testing Done**: N
--   **Which testing method agent to use?**: backend testing agent (using ) to validate the API fix, followed by the frontend testing agent to confirm the end-to-end UI functionality.
+-   **Agent Testing Done**: N (for the Driver App).
+-   **Which testing method agent to use?**: frontend testing agent. The agent should test the full driver workflow: login as a driver, view the assigned orders list, navigate to order details, and update an order's status.
 -   **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
--   **Issue 1**:  (P0) Cart item deletion is not working.
-
-**Issues Detail**:
--   **Issue 1**:
-    -   **Description**: When the user clicks the delete icon for an item in the shopping cart, the item is not removed. The user is blocked from managing their cart effectively.
-    -   **Attempted fixes**: The agent identified that a similar bug with update quantity was caused by a mismatch between the frontend sending a JSON body and the backend expecting query parameters. The agent has started viewing  to check the delete endpoint's implementation.
-    -   **Next debug checklist**:
-        1.  Analyze the  endpoint in  to confirm how it receives parameters.
-        2.  Review the  function in  to see how the API request is constructed.
-        3.  Modify the backend endpoint, likely by adding a Pydantic model to the function signature, to correctly accept the request data from the frontend.
-        4.  Restart the backend server using backend: stopped
-backend: started.
-        5.  Test the API endpoint directly using  to confirm the fix.
-        6.  Verify the end-to-end flow on the frontend.
-    -   **Why fix this issue and what will be achieved with the fix?**: This is a critical bug that prevents users from managing their shopping cart, blocking the core purchase workflow. Fixing it will restore essential e-commerce functionality.
-    -   **Status**: IN PROGRESS
-    -   **Is recurring issue?**: Y (This is the third cart-related API endpoint to have this specific parameter-handling issue).
-    -   **Should Test frontend/backend/both after fix?**: Both.
-    -   **Blocked on other issue**: None. This is the primary blocker.
+-   There are no known bugs or pending issues. The previously reported cart deletion bug was investigated and found to be non-reproducible; testing confirmed the feature works correctly.
 
 **In progress Task List**:
--   **Task 1**: Implement Phase 3.4 - Orders List Page.
-    -   **Where to resume**: The file  has been created but is empty. The task involves building the UI to fetch and display a list of the user's orders from the  endpoint. Each item should show Order ID, Date, Status, and Total Price.
-    -   **What will be achieved with this?**: Users will be able to view their complete order history.
-    -   **Status**: NOT STARTED
-    -   **Should Test frontend/backend/both after fix?**: Frontend.
-    -   **Blocked on something**: This task is blocked until the critical Delete from Cart issue is resolved, as per user instructions.
+-   **Task 1**: Complete Frontend for Phase 4 - Delivery Driver App (P0)
+    -   **Where to resume**: The agent needs to create the final component, , which allows a driver to view full order details and update its status. Afterwards, all new driver routes must be added to  and protected to only allow access for users with the  role.
+    -   **What will be achieved with this?**: A functional interface for delivery drivers to manage their assigned orders.
+    -   **Status**: IN PROGRESS
+    -   **Should Test frontend/backend/both after fix?**: Both. The frontend flow needs end-to-end testing, and this will inherently test the backend driver APIs.
+    -   **Blocked on something**: Nothing.
 
 **Upcoming and Future Tasks**
--   **Upcoming Tasks (Phase 3 MVP)**:
-    -   **(P0) Phase 3.5 - Order Details Page**: Create a page to display the full details of a single order, linked from the My Orders list.
-    -   **(P1) Phase 3.6 - Order Tracking Page**: Implement the visual, GOZEM-style status timeline ( ->  -> etc.) on the Order Details page.
-    -   **(P2) User Profile Page**: Create the user profile page, which will serve as the entry point to the My Orders list and other user settings.
-
--   **Future Tasks (Postponed)**:
-    -   **Phase 4**: Delivery Driver Application.
-    -   **Phase 5**: Administrator Dashboard.
+-   **Upcoming Tasks**:
+    -   **(P0) Implement Admin UI for Driver Assignment**: The backend API  exists, but the Admin Panel UI () has no feature to call it. A dropdown or button is needed to assign an available driver to an order. This is critical to make the Driver App usable.
+    -   **(P1) Integrate Real-time Map**: Implement the planned Leaflet/OpenStreetMap on the client-facing Order Details page for simulated delivery tracking.
+-   **Future Tasks**:
+    -   Full-scale analytics for the admin dashboard.
+    -   Integration of a real payment gateway.
 
 **Completed work in this session**
--   **Phase 1 - Foundation & Auth (DONE)**: Backend models, JWT authentication, and frontend auth pages are complete.
--   **Phase 2 - Core Shopping Experience (DONE)**: Backend APIs for products and cart created. Frontend features a GOZEM-style redesign for the Homepage, Product Catalog, and Product Detail pages. Currency is correctly set to FCFA.
--   **Phase 3 - Checkout Flow (Partially DONE)**: Backend order creation APIs are complete. Frontend has a full checkout flow from cart to an order success page.
--   **Critical Bug Fixes**:
-    -   Fixed an issue where items were not persisting in the cart across pages.
-    -   Fixed a bug preventing cart item quantity updates.
+-   **Phase 3 (Order Management)**: Completed the client-side order flow by creating the **My Orders** list and **Order Details** pages.
+-   **Phase 3.5 (Polish Pass)**:
+    -   **Address Management**: Implemented a full CRUD system for user addresses, integrated into the checkout flow.
+    -   **i18n Implementation**: Created a language context and added a persistent EN/FR toggle to the UI.
+    -   **Image & Currency Polish**: Updated product images via seed script and verified FCFA currency formatting is consistent.
+-   **Security Hardening**: Removed hardcoded credentials, moved them to  files, added a password change API, and implemented a preview environment warning banner in the admin panel.
+-   **Phase 5 (Admin Dashboard)**: Built the entire backend and frontend for the admin dashboard, including protected routes and APIs for managing orders, products, and users.
+-   **Phase 4 (Driver App - Backend)**: Implemented all necessary backend models, APIs, and seed scripts for the driver functionality.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
--   **Frontend**: React, Tailwind CSS, React Router, Axios for API calls, React Context for auth state.
--   **Backend**: FastAPI, MongoDB with Motor (async), Pydantic for data validation, JWT for authentication.
--   **Architecture**: Full-stack SPA with a REST API.
+-   **Frontend**: React, Tailwind CSS, React Router, Axios, React Context.
+-   **Backend**: FastAPI, MongoDB (Motor), Pydantic, JWT.
+-   **Architecture**: Full-stack SPA with a REST API supporting three distinct user roles (, , ) via role-based access control (RBAC) in JWTs and protected routes.
+-   **i18n**: Language state managed via React Context and persisted in .
 
 **key DB schema**
--   : {id, name, email, password_hash, role, address}
--   : {id, name, brand, price (integer), stock, image_url, description}
--   : {user_id, items: [{product_id, quantity, price}], subtotal, total}
--   : {user_id, items: [...], total, status, delivery_address, created_at}
+-   : {id, name, email, password_hash, role: client | admin | driver}
+-   : {id, name, brand, price, stock, image_url, description}
+-   : {user_id, items: [...]}
+-   : {id, user_id, items: [...], total, status, delivery_address, **driver_id**, **failure_reason**, created_at}
+-   ****: {id, user_id, name, city, neighborhood, description, phone, is_default}
 
 **changes in tech stack**
 -   None.
 
 **All files of reference**
--   : Contains all backend API logic, including the broken cart delete endpoint.
--   : The UI component where the delete action is triggered.
--   : The next file to be implemented after the current bug is fixed.
--   : Contains all frontend routing.
-
-**Areas that need refactoring**:
--   The cart API endpoints in  have repeatedly caused bugs due to inconsistent request handling (query params vs. JSON body). It would be beneficial to refactor all cart endpoints to standardize on using Pydantic models for request bodies.
+-   : Contains all backend logic, including new admin and driver endpoints.
+-   : Contains all frontend routing for client, admin, and driver sections.
+-   : Core of the i18n system.
+-   : Directory for the in-progress Driver App UI.
+-   : Directory for the completed Admin Panel UI.
+-    & : Scripts to seed test users.
+-   : Now contains default credentials for test users.
 
 **key api endpoints**
--   
--    (Login)
--   
--   
--    (Update quantity)
--    **(CURRENTLY BROKEN)**
--   
--   
+-   **Admin**: , , , , 
+-   **Driver**: , 
+-   **Address**: , 
+-   **Security**: , 
 
 **Critical Info for New Agent**
--   Your immediate priority is to fix the delete item from cart bug. The user wants this resolved before any new features are added.
--   The root cause is likely a parameter handling mismatch in the FastAPI backend, a pattern seen in two previous cart-related bugs. The fix involves using a Pydantic  for the request body in the endpoint signature.
--   The UI/UX must follow the premium GOZEM-style established in the Homepage and Product pages. All new UI must be consistent with this design language.
--   All currency must be displayed in FCFA (e.g., 12 000 FCFA). Prices are stored as integers in the backend.
+-   Your immediate task is to complete the **Phase 4 Driver App frontend**. Create , then add all  routes to , ensuring they are protected and only accessible to users with the  role.
+-   After completing the driver UI, the next critical task is to implement the **admin's ability to assign drivers to orders**. The backend API exists; you must add a UI element (e.g., a dropdown of drivers) to the  page to trigger the assignment.
+-   All new UI text must be added to the  object in  and rendered using the  hook to support the EN/FR toggle.
 
 **documents and test reports created in this job**
--   None.
+-   
+-   
+-   
 
 **Last 10 User Messages and any pending HUMAN messages**
-1.  **User**: ok to delete order in cart is not working pls fix it and lets move on" - **(PENDING)**
-2.  **User**: "Lets move on Phase 3.4 - Orders List Page - *Superseded by the above request to fix the bug first.*
-3.  **User**: Reported an error when updating item quantity in the cart. - **(COMPLETED)**
-4.  **User**: Requested a UI fix for the phone number input on the checkout page. - **(COMPLETED)**
-5.  **User**: Provided a detailed plan for implementing Phase 3 (Checkout & Order Flow). - **(IN PROGRESS)**
-6.  **User**: Reported a critical bug where items did not persist in the cart. - **(COMPLETED)**
-7.  **User**: Approved the redesign of the cart page. - **(COMPLETED)**
-8.  **User**: Requested a major redesign of the Homepage, Product Catalog, and Cart pages to follow a GOZEM-style. - **(COMPLETED)**
-9.  **User**: Requested a premium redesign of the homepage. - **(COMPLETED)**
-10. **User**: Approved the Product Detail page and requested a currency update to FCFA (XAF). - **(COMPLETED)**
+1.  **User**: Approved the Phase 4 plan and specified implementation details (admin assignment, predefined failure reasons, seed script for driver). (COMPLETED)
+2.  **User**: Requested Phase 4 (Driver App) to begin. (IN PROGRESS)
+3.  **User**: Approved the previous work (Phase 3.5 + 5) and requested important security updates. (COMPLETED)
+4.  **User**: Provided feedback that the language toggle was not working. (COMPLETED - Agent investigated and fixed the ).
+5.  **User**: Approved the plan for Phase 3.5 polish and Phase 5 admin dashboard. (COMPLETED)
+6.  **User**: Requested a simple language toggle (EN/FR) be added to the Profile page. (COMPLETED)
+7.  **User**: Approved Phase 3.5 and provided detailed requirements for the Mes Adresses page and image selection. (COMPLETED)
+8.  **User**: Requested a Phase 3.5 polish pass before starting Phase 4/5, focusing on currency, images, language, and an address management page. (COMPLETED)
+9.  **User**: Approved Phase 3 completion. (COMPLETED)
+10. **User**: Sent 'continue' to acknowledge the testing agent's report. (COMPLETED)
 
 **Project Health Check:**
--   **Broken**: Cart item deletion.
--   **Mocked**: Payment methods, delivery driver data.
+-   **Broken**: None.
+-   **Mocked**: Payment processing.
+-   **Incomplete**: The Driver App frontend is partially built.
 
 **3rd Party Integrations**
--   Leaflet & OpenStreetMap (Planned for Phase 3.6, not yet implemented).
+-   Leaflet & OpenStreetMap (Planned for a future phase, not yet implemented).
 
 **Testing status**
--   **Testing agent used after significant changes**: NO
+-   **Testing agent used after significant changes**: YES (for cart and order flows).
 -   **Troubleshoot agent used after agent stuck in loop**: NO
 -   **Test files created**: []
--   **Known regressions**: The cart item deletion functionality is broken.
+-   **Known regressions**: None.
 
 **Credentials to test flow:**
--   No specific credentials needed. New users can be created through the registration page to test the complete flow.
+-   Run the seed scripts to create test users with credentials defined in :
+    -   🔐 Creating admin user...
+==================================================
+⚠️  DEV ONLY - Default admin credentials should be changed in production!
+   Using ADMIN_EMAIL from env: admin@gazman.cm
+✅ Admin user already exists: admin@gazman.cm
+   To reset password, delete the user from DB and re-run this script.
+    -   🚚 Creating driver user...
+==================================================
+⚠️  DEV ONLY - Default driver credentials should be changed in production!
+   Using DRIVER_EMAIL: driver@gazman.cm
+✅ Driver user created successfully!
+   Email: driver@gazman.cm
+   ⚠️  IMPORTANT: Change the default password immediately after first login!
+-   Regular users can be created via the frontend registration page.
 
 **What agent forgot to execute**
--   Nothing has been forgotten. The agent is following the user's latest and most urgent request to fix the cart deletion bug. The implementation of the  page has been implicitly deferred by the user's other priorities.</analysis>
+-   The agent has addressed all user requests. The next logical step, implementing the admin UI for driver assignment, has not been explicitly planned but is an emergent requirement for the driver feature to be complete.</analysis>
