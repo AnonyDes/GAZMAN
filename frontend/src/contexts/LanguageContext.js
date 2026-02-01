@@ -211,9 +211,16 @@ const translations = {
 };
 
 export const LanguageProvider = ({ children }) => {
-  const { user } = useAuth();
+  // Try to get user from auth context - might not be available immediately
+  let user = null;
+  try {
+    const auth = useAuth();
+    user = auth?.user;
+  } catch {
+    // Auth context not ready yet, use localStorage only
+  }
   
-  // Initialize from localStorage first (sync), then update from user if available
+  // Initialize from localStorage first (sync)
   const [language, setLanguageState] = useState(() => {
     const savedLang = localStorage.getItem('gaz_man_language');
     return savedLang || 'fr';
@@ -228,6 +235,7 @@ export const LanguageProvider = ({ children }) => {
   }, [user?.language]);
 
   const setLanguage = (lang) => {
+    console.log('Setting language to:', lang); // Debug log
     setLanguageState(lang);
     localStorage.setItem('gaz_man_language', lang);
   };
