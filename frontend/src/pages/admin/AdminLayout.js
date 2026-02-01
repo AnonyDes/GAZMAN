@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
+import axios from 'axios';
 import { 
   LayoutDashboard, 
   Package, 
@@ -9,20 +10,36 @@ import {
   Users, 
   LogOut,
   Menu,
-  X
+  X,
+  AlertTriangle
 } from 'lucide-react';
+
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const API = `${BACKEND_URL}/api`;
 
 const AdminLayout = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
   const { t, language } = useLanguage();
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [isPreview, setIsPreview] = React.useState(false);
 
-  // Check if user is admin
+  // Check if user is admin and get environment
   React.useEffect(() => {
     if (user && user.role !== 'admin') {
       navigate('/home');
     }
+    
+    // Check environment
+    const checkEnvironment = async () => {
+      try {
+        const response = await axios.get(`${API}/environment`);
+        setIsPreview(response.data.is_preview);
+      } catch (error) {
+        console.error('Error checking environment:', error);
+      }
+    };
+    checkEnvironment();
   }, [user, navigate]);
 
   const handleLogout = () => {
