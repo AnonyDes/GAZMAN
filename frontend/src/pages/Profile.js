@@ -21,7 +21,7 @@ const API = `${BACKEND_URL}/api`;
 const Profile = () => {
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
   const [orderStats, setOrderStats] = useState({ total: 0, inProgress: 0, delivered: 0 });
 
   useEffect(() => {
