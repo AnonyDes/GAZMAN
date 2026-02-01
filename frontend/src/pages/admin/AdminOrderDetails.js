@@ -209,6 +209,74 @@ const AdminOrderDetails = () => {
             </div>
           </div>
 
+          {/* Driver Assignment */}
+          <div className="bg-white rounded-xl shadow-sm p-6" data-testid="driver-assignment-section">
+            <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center space-x-2">
+              <Truck size={20} className="text-green-600" />
+              <span>{t('Assigner un livreur', 'Assign Driver')}</span>
+            </h2>
+            
+            {/* Current Driver Info */}
+            {order.driver_id && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center justify-between">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                    <Truck size={18} className="text-white" />
+                  </div>
+                  <div>
+                    <p className="text-sm text-green-600">{t('Livreur assigné', 'Assigned Driver')}</p>
+                    <p className="font-semibold text-green-800">{order.driver_name || t('Livreur', 'Driver')}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+            
+            {/* Driver Selection */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  {t('Sélectionner un livreur', 'Select Driver')}
+                </label>
+                <select
+                  value={selectedDriver}
+                  onChange={(e) => setSelectedDriver(e.target.value)}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white"
+                  data-testid="driver-select"
+                >
+                  <option value="">{t('-- Aucun livreur --', '-- No driver --')}</option>
+                  {drivers.map((driver) => (
+                    <option key={driver.id} value={driver.id}>
+                      {driver.name} ({driver.email})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
+              <button
+                onClick={assignDriver}
+                disabled={assigningDriver}
+                className="w-full flex items-center justify-center space-x-2 px-4 py-3 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold transition-colors disabled:opacity-50"
+                data-testid="assign-driver-button"
+              >
+                <UserPlus size={18} />
+                <span>
+                  {assigningDriver 
+                    ? t('Assignation...', 'Assigning...') 
+                    : selectedDriver 
+                      ? t('Assigner ce livreur', 'Assign this driver')
+                      : t('Retirer le livreur', 'Remove driver')
+                  }
+                </span>
+              </button>
+              
+              {drivers.length === 0 && (
+                <p className="text-sm text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
+                  {t('Aucun livreur disponible. Créez d\'abord un compte livreur.', 'No drivers available. Create a driver account first.')}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* Order Items */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4">
