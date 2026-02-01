@@ -1,5 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { useAuth } from './AuthContext';
+import React, { createContext, useState, useContext } from 'react';
 
 const LanguageContext = createContext(null);
 
