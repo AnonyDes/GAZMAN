@@ -10,7 +10,10 @@ import {
   CreditCard, 
   User,
   Package,
-  CheckCircle
+  CheckCircle,
+  Truck,
+  UserPlus,
+  X
 } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency';
 
@@ -25,6 +28,9 @@ const AdminOrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [drivers, setDrivers] = useState([]);
+  const [selectedDriver, setSelectedDriver] = useState('');
+  const [assigningDriver, setAssigningDriver] = useState(false);
 
   const t = (fr, en) => language === 'fr' ? fr : en;
 
