@@ -722,6 +722,215 @@ async def set_default_address(
     return {"message": "Address set as default"}
 
 # ============================================
+# Admin Endpoints
+# ============================================
+
+async def get_admin_user(current_user: User = Depends(get_current_user)):
+    """Dependency to verify admin role."""
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return current_user
+
+# Admin Orders
+@api_router.get("/admin/orders")
+async def admin_get_orders(
+    status: Optional[str] = None,
+    limit: int = 50,
+    skip: int = 0,
+    admin: User = Depends(get_admin_user)
+):
+    """Get all orders (admin only)."""
+    query = {}
+    if status:
+        query["status"] = status
+    
+    orders = await db.orders.find(query, {"_id": 0}).sort("created_at", -1).skip(skip).limit(limit).to_list(limit)
+    total = await db.orders.count_documents(query)
+    
+    # Enrich with user info
+    for order in orders:
+        user = await db.users.find_one({"id": order["user_id"]}, {"_id": 0, "password_hash": 0})
+        order["user"] = user
+    
+    return {"orders": orders, "total": total}
+
+@api_router.get("/admin/orders/{order_id}")
+async def admin_get_order(
+    order_id: str,
+    admin: User = Depends(get_admin_user)
+):
+    """Get single order details (admin only)."""
+    order = await db.orders.find_one({"id": order_id}, {"_id": 0})
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    # Enrich with user info
+    user = await db.users.find_one({"id": order["user_id"]}, {"_id": 0, "password_hash": 0})
+    order["user"] = user
+    
+    return order
+
+@api_router.put("/admin/orders/{order_id}/status")
+async def admin_update_order_status(
+    order_id: str,
+    status_update: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Update order status (admin only)."""
+    valid_statuses = ["en_attente", "en_preparation", "en_livraison", "livree", "annulee"]
+    new_status = status_update.get("status")
+    
+    if not new_status or new_status not in valid_statuses:
+        raise HTTPException(status_code=400, detail=f"Invalid status. Must be one of: {valid_statuses}")
+    
+    result = await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {"status": new_status}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return {"message": "Order status updated", "new_status": new_status}
+
+# Admin Products
+@api_router.get("/admin/products")
+async def admin_get_products(
+    limit: int = 50,
+    skip: int = 0,
+    admin: User = Depends(get_admin_user)
+):
+    """Get all products with full details (admin only)."""
+    products = await db.products.find({}, {"_id": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.products.count_documents({})
+    return {"products": products, "total": total}
+
+@api_router.post("/admin/products")
+async def admin_create_product(
+    product_data: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Create a new product (admin only)."""
+    required_fields = ["name", "brand", "price", "stock", "category"]
+    for field in required_fields:
+        if field not in product_data:
+            raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+    
+    product_id = str(uuid.uuid4())
+    product = {
+        "id": product_id,
+        "name": product_data["name"],
+        "brand": product_data["brand"],
+        "category": product_data.get("category", "domestic"),
+        "size": product_data.get("size", "medium"),
+        "capacity": product_data.get("capacity", "12kg"),
+        "price": int(product_data["price"]),
+        "stock": int(product_data["stock"]),
+        "image_url": product_data.get("image_url", ""),
+        "description": product_data.get("description", ""),
+        "rating": product_data.get("rating", 4.5),
+        "delivery_time": product_data.get("delivery_time", "15-20 min"),
+        "created_at": datetime.utcnow().isoformat()
+    }
+    
+    await db.products.insert_one(product)
+    del product["_id"] if "_id" in product else None
+    
+    return {"message": "Product created", "product": product}
+
+@api_router.put("/admin/products/{product_id}")
+async def admin_update_product(
+    product_id: str,
+    product_data: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Update a product (admin only)."""
+    # Check if product exists
+    existing = await db.products.find_one({"id": product_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    # Build update dict
+    update_fields = {}
+    allowed_fields = ["name", "brand", "category", "size", "capacity", "price", "stock", 
+                      "image_url", "description", "rating", "delivery_time"]
+    
+    for field in allowed_fields:
+        if field in product_data:
+            if field in ["price", "stock"]:
+                update_fields[field] = int(product_data[field])
+            elif field == "rating":
+                update_fields[field] = float(product_data[field])
+            else:
+                update_fields[field] = product_data[field]
+    
+    if update_fields:
+        await db.products.update_one({"id": product_id}, {"$set": update_fields})
+    
+    # Return updated product
+    updated = await db.products.find_one({"id": product_id}, {"_id": 0})
+    return {"message": "Product updated", "product": updated}
+
+@api_router.delete("/admin/products/{product_id}")
+async def admin_delete_product(
+    product_id: str,
+    admin: User = Depends(get_admin_user)
+):
+    """Delete a product (admin only)."""
+    result = await db.products.delete_one({"id": product_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return {"message": "Product deleted"}
+
+# Admin Users
+@api_router.get("/admin/users")
+async def admin_get_users(
+    limit: int = 50,
+    skip: int = 0,
+    admin: User = Depends(get_admin_user)
+):
+    """Get all users (admin only, read-only)."""
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).skip(skip).limit(limit).to_list(limit)
+    total = await db.users.count_documents({})
+    return {"users": users, "total": total}
+
+# Admin Stats
+@api_router.get("/admin/stats")
+async def admin_get_stats(admin: User = Depends(get_admin_user)):
+    """Get dashboard statistics (admin only)."""
+    total_orders = await db.orders.count_documents({})
+    pending_orders = await db.orders.count_documents({"status": "en_attente"})
+    preparing_orders = await db.orders.count_documents({"status": "en_preparation"})
+    delivering_orders = await db.orders.count_documents({"status": "en_livraison"})
+    delivered_orders = await db.orders.count_documents({"status": "livree"})
+    cancelled_orders = await db.orders.count_documents({"status": "annulee"})
+    
+    total_users = await db.users.count_documents({})
+    total_products = await db.products.count_documents({})
+    
+    # Calculate revenue from delivered orders
+    pipeline = [
+        {"$match": {"status": "livree"}},
+        {"$group": {"_id": None, "total_revenue": {"$sum": "$total"}}}
+    ]
+    revenue_result = await db.orders.aggregate(pipeline).to_list(1)
+    total_revenue = revenue_result[0]["total_revenue"] if revenue_result else 0
+    
+    return {
+        "orders": {
+            "total": total_orders,
+            "pending": pending_orders,
+            "preparing": preparing_orders,
+            "delivering": delivering_orders,
+            "delivered": delivered_orders,
+            "cancelled": cancelled_orders
+        },
+        "users": total_users,
+        "products": total_products,
+        "revenue": total_revenue
+    }
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
