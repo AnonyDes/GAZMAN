@@ -37,15 +37,24 @@ Build a full-stack e-commerce application named "GAZ MAN" for selling gas cylind
 
 ### Phase 3.5 - Polish Pass ✅
 - [x] **Address Management (Mes Adresses)**: Full CRUD for delivery addresses
-  - Add/Edit/Delete addresses
-  - Set default address
-  - Address fields: name, city, quartier, description, phone
 - [x] **Checkout Integration**: Auto-fill from saved addresses, address picker
-- [x] **Language Support (i18n)**: French/English toggle via LanguageContext
+- [x] **Language Support (i18n)**: French/English toggle on Profile page
+  - Persists to localStorage
   - UI labels, buttons, status messages translated
-  - Default language: French
-- [x] **FCFA Formatting**: Verified consistent across all pages (no $, no decimals)
-- [x] **Product Images**: Updated seed data with gas cylinder stock photos
+- [x] **FCFA Formatting**: Verified consistent across all pages
+
+### Phase 5 - Admin Dashboard ✅
+- [x] **Admin Authentication**: Role-based access control (role: "admin")
+- [x] **Admin Dashboard**: Stats overview (orders, users, products, revenue)
+- [x] **Orders Management**: 
+  - List all orders with status filter
+  - View order details
+  - Update order status (en_attente → en_preparation → en_livraison → livree)
+- [x] **Products Management**: Full CRUD
+  - Create new products
+  - Update products (name, price, stock, etc.)
+  - Delete products
+- [x] **Users Management**: Read-only list of all registered users
 
 ### Order Status Timeline
 The app supports 5 order statuses:
@@ -55,7 +64,13 @@ The app supports 5 order statuses:
 4. `livree` - Livrée (Delivered)
 5. `annulee` - Annulée (Cancelled)
 
+## Admin Credentials
+- **Email**: admin@gazman.cm
+- **Password**: Admin123!
+
 ## Key API Endpoints
+
+### Customer APIs
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | POST | /api/auth/register | User registration |
@@ -76,6 +91,19 @@ The app supports 5 order statuses:
 | DELETE | /api/addresses/{id} | Delete address |
 | POST | /api/addresses/{id}/set-default | Set address as default |
 
+### Admin APIs
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | /api/admin/stats | Dashboard statistics |
+| GET | /api/admin/orders | List all orders |
+| GET | /api/admin/orders/{id} | Get order details |
+| PUT | /api/admin/orders/{id}/status | Update order status |
+| GET | /api/admin/products | List all products |
+| POST | /api/admin/products | Create product |
+| PUT | /api/admin/products/{id} | Update product |
+| DELETE | /api/admin/products/{id} | Delete product |
+| GET | /api/admin/users | List all users |
+
 ## Database Schema
 ```
 users: {id, name, email, password_hash, role, address, state, language, created_at}
@@ -89,11 +117,12 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
 ```
 /app/
 ├── backend/
-│   ├── server.py          # Main API server
+│   ├── server.py          # Main API server with admin endpoints
 │   ├── models.py          # Pydantic models
 │   ├── auth.py            # JWT utilities
 │   ├── dependencies.py    # Auth dependencies
 │   ├── seed_data.py       # Database seeding
+│   ├── create_admin.py    # Admin user creation script
 │   └── tests/             # Pytest test files
 └── frontend/
     └── src/
@@ -113,8 +142,15 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
         │   ├── OrderSuccess.js
         │   ├── MyOrders.js
         │   ├── OrderDetails.js
-        │   ├── Profile.js
-        │   ├── MyAddresses.js       # Address management
+        │   ├── Profile.js          # With language toggle
+        │   ├── MyAddresses.js
+        │   ├── admin/
+        │   │   ├── AdminLayout.js
+        │   │   ├── AdminDashboard.js
+        │   │   ├── AdminOrders.js
+        │   │   ├── AdminOrderDetails.js
+        │   │   ├── AdminProducts.js
+        │   │   └── AdminUsers.js
         │   └── (Auth pages)
         ├── utils/
         │   └── currency.js
@@ -130,13 +166,12 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
 
 ### P1 - High Priority
 - [ ] Phase 4: Delivery Driver Application
-- [ ] Phase 5: Administrator Dashboard
 - [ ] Real payment integration (Orange Money, MTN Mobile Money, etc.)
 
 ### P2 - Medium Priority
 - [ ] Push notifications for order status updates
 - [ ] Real-time delivery tracking with maps
-- [ ] User settings/preferences page
+- [ ] User settings/preferences page (full implementation)
 
 ### P3 - Low Priority
 - [ ] Help & Support page
