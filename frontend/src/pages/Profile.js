@@ -10,7 +10,8 @@ import {
   ChevronRight,
   Settings,
   HelpCircle,
-  Shield
+  Shield,
+  Globe
 } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 
