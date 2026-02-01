@@ -180,6 +180,55 @@ async def reset_password(request: ResetPasswordRequest):
     
     return {"message": "Password reset successful"}
 
+@api_router.post("/auth/change-password")
+async def change_password(
+    password_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Change password for authenticated user."""
+    current_password = password_data.get("current_password")
+    new_password = password_data.get("new_password")
+    
+    if not current_password or not new_password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password and new password are required"
+        )
+    
+    # Get user with password hash
+    user_doc = await db.users.find_one({"id": current_user.id})
+    if not user_doc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    
+    # Verify current password
+    if not verify_password(current_password, user_doc["password_hash"]):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect"
+        )
+    
+    # Update password
+    new_password_hash = get_password_hash(new_password)
+    await db.users.update_one(
+        {"id": current_user.id},
+        {"$set": {"password_hash": new_password_hash}}
+    )
+    
+    return {"message": "Password changed successfully"}
+
+@api_router.get("/environment")
+async def get_environment():
+    """Get environment info (for UI warnings)."""
+    env = os.environ.get("ENVIRONMENT", "production")
+    return {
+        "environment": env,
+        "is_preview": env == "preview",
+        "is_production": env == "production"
+    }
+
 # ============================================
 # Product Endpoints
 # ============================================
