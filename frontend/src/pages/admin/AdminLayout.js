@@ -66,6 +66,20 @@ const AdminLayout = () => {
         </button>
       </div>
 
+      {/* Preview Environment Warning */}
+      {isPreview && (
+        <div className="bg-yellow-500 text-black px-4 py-2 text-center font-medium">
+          <div className="flex items-center justify-center space-x-2">
+            <AlertTriangle size={20} />
+            <span>
+              {language === 'fr' 
+                ? 'ENVIRONNEMENT DE PRÉVISUALISATION - Les données peuvent ne pas être réelles' 
+                : 'PREVIEW ENVIRONMENT - Data may not be real'}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="flex">
         {/* Sidebar */}
         <aside className={`
