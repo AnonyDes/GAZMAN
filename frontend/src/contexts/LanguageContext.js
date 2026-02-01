@@ -212,22 +212,22 @@ const translations = {
 
 export const LanguageProvider = ({ children }) => {
   const { user } = useAuth();
-  const [language, setLanguage] = useState('fr'); // Default to French
+  
+  // Initialize language from user preference or localStorage
+  const getInitialLanguage = () => {
+    if (user?.language) return user.language;
+    const savedLang = localStorage.getItem('gaz_man_language');
+    return savedLang || 'fr';
+  };
+  
+  const [language, setLanguage] = useState(getInitialLanguage);
 
-  // Sync language with user preference
+  // Update language when user changes
   useEffect(() => {
-    if (user?.language) {
+    if (user?.language && user.language !== language) {
       setLanguage(user.language);
     }
-  }, [user]);
-
-  // Also check localStorage for non-logged-in users
-  useEffect(() => {
-    const savedLang = localStorage.getItem('gaz_man_language');
-    if (savedLang && !user) {
-      setLanguage(savedLang);
-    }
-  }, [user]);
+  }, [user, language]);
 
   const changeLanguage = (lang) => {
     setLanguage(lang);
