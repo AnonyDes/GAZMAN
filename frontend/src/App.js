@@ -24,6 +24,11 @@ import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminOrderDetails from '@/pages/admin/AdminOrderDetails';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminUsers from '@/pages/admin/AdminUsers';
+// Driver Pages
+import DriverLayout from '@/pages/driver/DriverLayout';
+import DriverDashboard from '@/pages/driver/DriverDashboard';
+import DriverOrders from '@/pages/driver/DriverOrders';
+import DriverOrderDetails from '@/pages/driver/DriverOrderDetails';
 import '@/App.css';
 
 function App() {
