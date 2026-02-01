@@ -130,6 +130,33 @@ class UpdateCartRequest(BaseModel):
     quantity: int
     size: str = "medium"
 
+# Address Models
+class AddressBase(BaseModel):
+    name: str  # e.g., "Maison", "Bureau"
+    city: str  # e.g., "Yaoundé", "Douala"
+    quartier: str  # e.g., "Bastos", "Bonapriso"
+    description: Optional[str] = None  # Landmark / Point de repère
+    phone: str
+    is_default: bool = False
+
+class AddressCreate(AddressBase):
+    pass
+
+class AddressUpdate(BaseModel):
+    name: Optional[str] = None
+    city: Optional[str] = None
+    quartier: Optional[str] = None
+    description: Optional[str] = None
+    phone: Optional[str] = None
+    is_default: Optional[bool] = None
+
+class Address(AddressBase):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    user_id: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Delivery Models
 class Location(BaseModel):
     lat: float
