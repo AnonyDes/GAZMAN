@@ -826,7 +826,7 @@ async def admin_update_order_status(
     admin: User = Depends(get_admin_user)
 ):
     """Update order status (admin only)."""
-    valid_statuses = ["en_attente", "en_preparation", "en_livraison", "livree", "annulee"]
+    valid_statuses = ["en_attente", "en_preparation", "en_livraison", "livree", "annulee", "echouee"]
     new_status = status_update.get("status")
     
     if not new_status or new_status not in valid_statuses:
@@ -841,6 +841,47 @@ async def admin_update_order_status(
         raise HTTPException(status_code=404, detail="Order not found")
     
     return {"message": "Order status updated", "new_status": new_status}
+
+@api_router.put("/admin/orders/{order_id}/assign-driver")
+async def admin_assign_driver(
+    order_id: str,
+    assignment: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Assign a driver to an order (admin only)."""
+    driver_id = assignment.get("driver_id")
+    
+    if not driver_id:
+        # Unassign driver
+        await db.orders.update_one(
+            {"id": order_id},
+            {"$set": {"driver_id": None, "driver_name": None}}
+        )
+        return {"message": "Driver unassigned from order"}
+    
+    # Verify driver exists and has driver role
+    driver = await db.users.find_one({"id": driver_id, "role": "driver"}, {"_id": 0, "password_hash": 0})
+    if not driver:
+        raise HTTPException(status_code=404, detail="Driver not found")
+    
+    result = await db.orders.update_one(
+        {"id": order_id},
+        {"$set": {"driver_id": driver_id, "driver_name": driver["name"]}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Order not found")
+    
+    return {"message": "Driver assigned to order", "driver": {"id": driver_id, "name": driver["name"]}}
+
+@api_router.get("/admin/drivers")
+async def admin_get_drivers(admin: User = Depends(get_admin_user)):
+    """Get all drivers (admin only)."""
+    drivers = await db.users.find(
+        {"role": "driver"}, 
+        {"_id": 0, "password_hash": 0}
+    ).to_list(100)
+    return {"drivers": drivers, "total": len(drivers)}
 
 # Admin Products
 @api_router.get("/admin/products")
