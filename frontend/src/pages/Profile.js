@@ -146,6 +146,47 @@ const Profile = () => {
         </div>
       </div>
 
+      {/* Language Toggle */}
+      <div className="px-4 mt-6">
+        <div className="bg-white rounded-2xl shadow-md p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+                <Globe size={20} className="text-indigo-600" />
+              </div>
+              <div>
+                <p className="font-semibold text-gray-900">{language === 'fr' ? 'Langue' : 'Language'}</p>
+                <p className="text-sm text-gray-500">{language === 'fr' ? 'Français / English' : 'French / English'}</p>
+              </div>
+            </div>
+            <div className="flex bg-gray-100 rounded-xl p-1">
+              <button
+                onClick={() => setLanguage('fr')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  language === 'fr'
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                data-testid="lang-fr"
+              >
+                FR
+              </button>
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                  language === 'en'
+                    ? 'bg-white text-orange-600 shadow-sm'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+                data-testid="lang-en"
+              >
+                EN
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Menu Items */}
       <div className="px-4 mt-6 space-y-3">
         {menuItems.map((item) => {
