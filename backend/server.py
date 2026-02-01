@@ -834,7 +834,8 @@ async def admin_create_product(
     }
     
     await db.products.insert_one(product)
-    del product["_id"] if "_id" in product else None
+    if "_id" in product:
+        del product["_id"]
     
     return {"message": "Product created", "product": product}
 
