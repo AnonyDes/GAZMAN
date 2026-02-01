@@ -17,6 +17,13 @@ import MyOrders from '@/pages/MyOrders';
 import OrderDetails from '@/pages/OrderDetails';
 import Profile from '@/pages/Profile';
 import MyAddresses from '@/pages/MyAddresses';
+// Admin Pages
+import AdminLayout from '@/pages/admin/AdminLayout';
+import AdminDashboard from '@/pages/admin/AdminDashboard';
+import AdminOrders from '@/pages/admin/AdminOrders';
+import AdminOrderDetails from '@/pages/admin/AdminOrderDetails';
+import AdminProducts from '@/pages/admin/AdminProducts';
+import AdminUsers from '@/pages/admin/AdminUsers';
 import '@/App.css';
 
 function App() {
