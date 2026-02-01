@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
 import { 
   Package, 
@@ -19,6 +20,7 @@ const API = `${BACKEND_URL}/api`;
 const Profile = () => {
   const navigate = useNavigate();
   const { user, token, logout } = useAuth();
+  const { t } = useLanguage();
   const [orderStats, setOrderStats] = useState({ total: 0, inProgress: 0, delivered: 0 });
 
   useEffect(() => {
@@ -43,7 +45,7 @@ const Profile = () => {
   }, [token]);
 
   const handleLogout = () => {
-    if (window.confirm('Êtes-vous sûr de vouloir vous déconnecter?')) {
+    if (window.confirm(t('auth.logout.confirm'))) {
       logout();
       navigate('/login');
     }
@@ -52,25 +54,24 @@ const Profile = () => {
   const menuItems = [
     {
       icon: Package,
-      label: 'Mes Commandes',
-      description: 'Voir l\'historique des commandes',
+      labelKey: 'profile.myOrders',
+      descKey: 'profile.myOrdersDesc',
       path: '/orders',
       iconBg: 'bg-orange-100',
       iconColor: 'text-orange-600'
     },
     {
       icon: MapPin,
-      label: 'Mes Adresses',
-      description: 'Gérer mes adresses de livraison',
+      labelKey: 'profile.myAddresses',
+      descKey: 'profile.myAddressesDesc',
       path: '/addresses',
       iconBg: 'bg-blue-100',
-      iconColor: 'text-blue-600',
-      comingSoon: true
+      iconColor: 'text-blue-600'
     },
     {
       icon: Settings,
-      label: 'Paramètres',
-      description: 'Modifier mes informations',
+      labelKey: 'profile.settings',
+      descKey: 'profile.settingsDesc',
       path: '/settings',
       iconBg: 'bg-gray-100',
       iconColor: 'text-gray-600',
@@ -78,8 +79,8 @@ const Profile = () => {
     },
     {
       icon: HelpCircle,
-      label: 'Aide & Support',
-      description: 'Centre d\'aide et FAQ',
+      labelKey: 'profile.help',
+      descKey: 'profile.helpDesc',
       path: '/help',
       iconBg: 'bg-green-100',
       iconColor: 'text-green-600',
@@ -87,8 +88,8 @@ const Profile = () => {
     },
     {
       icon: Shield,
-      label: 'Confidentialité',
-      description: 'Politique de confidentialité',
+      labelKey: 'profile.privacy',
+      descKey: 'profile.privacyDesc',
       path: '/privacy',
       iconBg: 'bg-purple-100',
       iconColor: 'text-purple-600',
@@ -131,15 +132,15 @@ const Profile = () => {
         <div className="bg-white rounded-2xl shadow-lg p-4 grid grid-cols-3 gap-4">
           <div className="text-center">
             <p className="text-2xl font-bold text-orange-600" data-testid="stats-total">{orderStats.total}</p>
-            <p className="text-xs text-gray-500">Commandes</p>
+            <p className="text-xs text-gray-500">{t('profile.stats.orders')}</p>
           </div>
           <div className="text-center border-x border-gray-100">
             <p className="text-2xl font-bold text-blue-600" data-testid="stats-in-progress">{orderStats.inProgress}</p>
-            <p className="text-xs text-gray-500">En cours</p>
+            <p className="text-xs text-gray-500">{t('profile.stats.inProgress')}</p>
           </div>
           <div className="text-center">
             <p className="text-2xl font-bold text-green-600" data-testid="stats-delivered">{orderStats.delivered}</p>
-            <p className="text-xs text-gray-500">Livrées</p>
+            <p className="text-xs text-gray-500">{t('profile.stats.delivered')}</p>
           </div>
         </div>
       </div>
@@ -163,14 +164,14 @@ const Profile = () => {
               </div>
               <div className="flex-1 ml-4 text-left">
                 <div className="flex items-center space-x-2">
-                  <p className="font-semibold text-gray-900">{item.label}</p>
+                  <p className="font-semibold text-gray-900">{t(item.labelKey)}</p>
                   {item.comingSoon && (
                     <span className="px-2 py-0.5 bg-gray-100 text-gray-500 text-xs rounded-full">
-                      Bientôt
+                      {t('common.soon')}
                     </span>
                   )}
                 </div>
-                <p className="text-sm text-gray-500">{item.description}</p>
+                <p className="text-sm text-gray-500">{t(item.descKey)}</p>
               </div>
               <ChevronRight size={20} className="text-gray-400" />
             </button>
@@ -186,7 +187,7 @@ const Profile = () => {
           data-testid="logout-button"
         >
           <LogOut size={20} className="text-red-600" />
-          <span className="font-semibold text-red-600">Se Déconnecter</span>
+          <span className="font-semibold text-red-600">{t('auth.logout')}</span>
         </button>
       </div>
 
