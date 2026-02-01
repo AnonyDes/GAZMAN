@@ -211,31 +211,16 @@ const translations = {
 };
 
 export const LanguageProvider = ({ children }) => {
-  // Try to get user from auth context - might not be available immediately
-  let user = null;
-  try {
-    const auth = useAuth();
-    user = auth?.user;
-  } catch {
-    // Auth context not ready yet, use localStorage only
-  }
-  
-  // Initialize from localStorage first (sync)
+  // Initialize from localStorage
   const [language, setLanguageState] = useState(() => {
-    const savedLang = localStorage.getItem('gaz_man_language');
-    return savedLang || 'fr';
+    if (typeof window !== 'undefined') {
+      const savedLang = localStorage.getItem('gaz_man_language');
+      return savedLang || 'fr';
+    }
+    return 'fr';
   });
 
-  // Update language when user preference changes
-  useEffect(() => {
-    if (user?.language) {
-      setLanguageState(user.language);
-      localStorage.setItem('gaz_man_language', user.language);
-    }
-  }, [user?.language]);
-
   const setLanguage = (lang) => {
-    console.log('Setting language to:', lang); // Debug log
     setLanguageState(lang);
     localStorage.setItem('gaz_man_language', lang);
   };
@@ -244,7 +229,6 @@ export const LanguageProvider = ({ children }) => {
   const t = (key, fallback = key) => {
     const translation = translations[key];
     if (!translation) {
-      console.warn(`Missing translation for key: ${key}`);
       return fallback;
     }
     return translation[language] || translation['fr'] || fallback;
