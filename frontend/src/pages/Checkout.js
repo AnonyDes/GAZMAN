@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
-import { ArrowLeft, MapPin, Phone, CreditCard, AlertCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, CreditCard, AlertCircle, ChevronDown, Plus, Star } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -11,12 +12,17 @@ const API = `${BACKEND_URL}/api`;
 const Checkout = () => {
   const navigate = useNavigate();
   const { token, user } = useAuth();
+  const { t } = useLanguage();
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
+  const [savedAddresses, setSavedAddresses] = useState([]);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [showAddressPicker, setShowAddressPicker] = useState(false);
+  const [useNewAddress, setUseNewAddress] = useState(false);
   
   const [formData, setFormData] = useState({
-    delivery_address: user?.address || '',
+    delivery_address: '',
     phone: '',
     payment_method: 'cash'
   });
@@ -25,6 +31,7 @@ const Checkout = () => {
 
   useEffect(() => {
     fetchCart();
+    fetchAddresses();
   }, []);
 
   const fetchCart = async () => {
@@ -47,15 +54,48 @@ const Checkout = () => {
     }
   };
 
+  const fetchAddresses = async () => {
+    try {
+      const response = await axios.get(`${API}/addresses`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSavedAddresses(response.data);
+      
+      // Auto-select default address
+      const defaultAddr = response.data.find(a => a.is_default);
+      if (defaultAddr) {
+        selectAddress(defaultAddr);
+      } else if (response.data.length > 0) {
+        selectAddress(response.data[0]);
+      } else {
+        setUseNewAddress(true);
+      }
+    } catch (error) {
+      console.error('Error fetching addresses:', error);
+      setUseNewAddress(true);
+    }
+  };
+
+  const selectAddress = (address) => {
+    setSelectedAddressId(address.id);
+    setFormData(prev => ({
+      ...prev,
+      delivery_address: `${address.quartier}, ${address.city}${address.description ? ` - ${address.description}` : ''}`,
+      phone: address.phone.replace('+237 ', '').replace('+237', '')
+    }));
+    setUseNewAddress(false);
+    setShowAddressPicker(false);
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
     if (!formData.delivery_address.trim()) {
-      newErrors.delivery_address = 'Adresse de livraison requise';
+      newErrors.delivery_address = t('checkout.deliveryAddress') + ' ' + t('error.notFound');
     }
     
     if (!formData.phone.trim()) {
-      newErrors.phone = 'Numéro de téléphone requis';
+      newErrors.phone = t('checkout.phone') + ' ' + t('error.notFound');
     } else if (!/^[6-9]\d{8}$/.test(formData.phone.replace(/\s+/g, ''))) {
       newErrors.phone = 'Format: 6 XX XX XX XX (9 chiffres)';
     }
@@ -88,7 +128,7 @@ const Checkout = () => {
       navigate(`/order-success/${response.data.order_id}`);
     } catch (error) {
       console.error('Error creating order:', error);
-      alert('Erreur lors de la création de la commande');
+      alert(t('error.generic'));
       setProcessing(false);
     }
   };
@@ -115,6 +155,7 @@ const Checkout = () => {
   }
 
   const finalTotal = cart.subtotal >= 20000 ? cart.subtotal : cart.total;
+  const selectedAddress = savedAddresses.find(a => a.id === selectedAddressId);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 pb-32">
@@ -129,8 +170,8 @@ const Checkout = () => {
             <ArrowLeft size={24} className="text-white" />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-white">Finaliser la Commande</h1>
-            <p className="text-blue-200 text-sm">{cart.items.length} article{cart.items.length > 1 ? 's' : ''}</p>
+            <h1 className="text-2xl font-bold text-white">{t('checkout.title')}</h1>
+            <p className="text-blue-200 text-sm">{cart.items.length} {cart.items.length > 1 ? t('cart.items') : t('cart.item')}</p>
           </div>
         </div>
       </div>
@@ -139,23 +180,111 @@ const Checkout = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Delivery Address */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                <MapPin size={20} className="text-blue-600" />
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <MapPin size={20} className="text-blue-600" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{t('checkout.deliveryAddress')}</h2>
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Adresse de Livraison</h2>
+              {savedAddresses.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setShowAddressPicker(!showAddressPicker)}
+                  className="text-orange-600 text-sm font-semibold flex items-center"
+                >
+                  {t('common.edit')}
+                  <ChevronDown size={16} className={`ml-1 transition-transform ${showAddressPicker ? 'rotate-180' : ''}`} />
+                </button>
+              )}
             </div>
-            <textarea
-              name="delivery_address"
-              value={formData.delivery_address}
-              onChange={handleChange}
-              rows="3"
-              placeholder="Ex: 123 Rue de la Paix, Yaoundé, Cameroun"
-              className={`w-full px-4 py-3 border-2 ${errors.delivery_address ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none`}
-              data-testid="delivery-address-input"
-            />
-            {errors.delivery_address && (
-              <p className="text-red-500 text-sm mt-2">{errors.delivery_address}</p>
+
+            {/* Address Picker */}
+            {showAddressPicker && savedAddresses.length > 0 && (
+              <div className="mb-4 space-y-2">
+                {savedAddresses.map((addr) => (
+                  <button
+                    key={addr.id}
+                    type="button"
+                    onClick={() => selectAddress(addr)}
+                    className={`w-full p-3 rounded-xl border-2 text-left transition-all ${
+                      selectedAddressId === addr.id && !useNewAddress
+                        ? 'border-orange-500 bg-orange-50'
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span className="font-semibold text-gray-900">{addr.name}</span>
+                          {addr.is_default && (
+                            <span className="flex items-center text-xs text-orange-600">
+                              <Star size={10} fill="currentColor" className="mr-0.5" />
+                              {t('addresses.default')}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600">{addr.quartier}, {addr.city}</p>
+                        <p className="text-xs text-gray-500">{addr.phone}</p>
+                      </div>
+                      {selectedAddressId === addr.id && !useNewAddress && (
+                        <div className="w-5 h-5 bg-orange-500 rounded-full flex items-center justify-center">
+                          <span className="text-white text-xs">✓</span>
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => {
+                    setUseNewAddress(true);
+                    setSelectedAddressId(null);
+                    setFormData(prev => ({ ...prev, delivery_address: '', phone: '' }));
+                    setShowAddressPicker(false);
+                  }}
+                  className={`w-full p-3 rounded-xl border-2 border-dashed text-left transition-all flex items-center space-x-2 ${
+                    useNewAddress ? 'border-orange-500 bg-orange-50' : 'border-gray-300 hover:border-gray-400'
+                  }`}
+                >
+                  <Plus size={18} className="text-gray-500" />
+                  <span className="text-gray-600">{t('checkout.newAddress')}</span>
+                </button>
+              </div>
+            )}
+
+            {/* Selected Address Display or New Address Input */}
+            {!useNewAddress && selectedAddress ? (
+              <div className="bg-gray-50 p-4 rounded-xl">
+                <p className="font-semibold text-gray-900">{selectedAddress.name}</p>
+                <p className="text-gray-600">{selectedAddress.quartier}, {selectedAddress.city}</p>
+                {selectedAddress.description && (
+                  <p className="text-sm text-gray-500">{selectedAddress.description}</p>
+                )}
+              </div>
+            ) : (
+              <>
+                <textarea
+                  name="delivery_address"
+                  value={formData.delivery_address}
+                  onChange={handleChange}
+                  rows="3"
+                  placeholder="Ex: Bastos, Yaoundé - Près du marché"
+                  className={`w-full px-4 py-3 border-2 ${errors.delivery_address ? 'border-red-500' : 'border-gray-200'} rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none resize-none`}
+                  data-testid="delivery-address-input"
+                />
+                {errors.delivery_address && (
+                  <p className="text-red-500 text-sm mt-2">{errors.delivery_address}</p>
+                )}
+                <button
+                  type="button"
+                  onClick={() => navigate('/addresses')}
+                  className="mt-2 text-sm text-orange-600 font-semibold flex items-center"
+                >
+                  <Plus size={14} className="mr-1" />
+                  {t('addresses.addNew')}
+                </button>
+              </>
             )}
           </div>
 
@@ -165,7 +294,7 @@ const Checkout = () => {
               <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
                 <Phone size={20} className="text-green-600" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Téléphone</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t('checkout.phone')}</h2>
             </div>
             <div className="flex items-center space-x-2">
               <div className="bg-gray-100 px-4 py-3 rounded-xl border-2 border-gray-200 font-semibold text-gray-700">
@@ -185,7 +314,6 @@ const Checkout = () => {
             {errors.phone && (
               <p className="text-red-500 text-sm mt-2">{errors.phone}</p>
             )}
-            <p className="text-gray-500 text-xs mt-2">Entrez votre numéro sans le code pays</p>
           </div>
 
           {/* Payment Method */}
@@ -194,7 +322,7 @@ const Checkout = () => {
               <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
                 <CreditCard size={20} className="text-orange-600" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Mode de Paiement</h2>
+              <h2 className="text-lg font-bold text-gray-900">{t('checkout.paymentMethod')}</h2>
             </div>
             <div className="space-y-3">
               <button
@@ -210,8 +338,7 @@ const Checkout = () => {
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">💵</span>
                   <div className="text-left">
-                    <p className="font-semibold text-gray-900">Paiement à la Livraison</p>
-                    <p className="text-sm text-gray-500">Espèces</p>
+                    <p className="font-semibold text-gray-900">{t('checkout.cash')}</p>
                   </div>
                 </div>
                 {formData.payment_method === 'cash' && (
@@ -234,7 +361,7 @@ const Checkout = () => {
                 <div className="flex items-center space-x-3">
                   <span className="text-2xl">📱</span>
                   <div className="text-left">
-                    <p className="font-semibold text-gray-900">Mobile Money</p>
+                    <p className="font-semibold text-gray-900">{t('checkout.mobileMoney')}</p>
                     <p className="text-sm text-gray-500">MTN, Orange Money</p>
                   </div>
                 </div>
@@ -249,7 +376,7 @@ const Checkout = () => {
 
           {/* Order Summary */}
           <div className="bg-white rounded-2xl shadow-lg p-6">
-            <h2 className="text-lg font-bold text-gray-900 mb-4">Résumé de la Commande</h2>
+            <h2 className="text-lg font-bold text-gray-900 mb-4">{t('cart.orderSummary')}</h2>
             
             {/* Items */}
             <div className="space-y-3 mb-4">
@@ -271,14 +398,14 @@ const Checkout = () => {
 
             <div className="border-t-2 border-gray-100 pt-4 space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Sous-total</span>
+                <span className="text-gray-600">{t('cart.subtotal')}</span>
                 <span className="font-semibold">{formatCurrency(cart.subtotal)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-gray-600">Frais de livraison</span>
+                <span className="text-gray-600">{t('cart.deliveryFee')}</span>
                 <span className="font-semibold">
                   {cart.subtotal >= 20000 ? (
-                    <span className="text-green-600">Gratuit</span>
+                    <span className="text-green-600">{t('common.free')}</span>
                   ) : (
                     formatCurrency(cart.delivery_fee)
                   )}
@@ -286,7 +413,7 @@ const Checkout = () => {
               </div>
               <div className="border-t-2 border-gray-100 pt-3">
                 <div className="flex justify-between items-center">
-                  <span className="text-lg font-bold text-gray-900">Total</span>
+                  <span className="text-lg font-bold text-gray-900">{t('cart.total')}</span>
                   <span className="text-2xl font-bold text-orange-600" data-testid="checkout-total">
                     {formatCurrency(finalTotal)}
                   </span>
@@ -301,9 +428,9 @@ const Checkout = () => {
               <div className="flex items-start space-x-3">
                 <AlertCircle size={20} className="text-green-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-green-900 mb-1">🎉 Livraison Gratuite Activée!</p>
+                  <p className="text-sm font-semibold text-green-900 mb-1">{t('cart.freeDelivery')}!</p>
                   <p className="text-xs text-green-700">
-                    Économisez 3 500 FCFA sur cette commande
+                    {t('cart.freeDeliveryInfo')}
                   </p>
                 </div>
               </div>
@@ -320,7 +447,7 @@ const Checkout = () => {
           className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg hover:shadow-xl transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
           data-testid="confirm-order-button"
         >
-          {processing ? 'Traitement en cours...' : `Confirmer la Commande • ${formatCurrency(finalTotal)}`}
+          {processing ? t('checkout.processing') : `${t('checkout.placeOrder')} • ${formatCurrency(finalTotal)}`}
         </button>
       </div>
     </div>
