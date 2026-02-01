@@ -36,6 +36,7 @@ const AdminOrderDetails = () => {
 
   useEffect(() => {
     fetchOrder();
+    fetchDrivers();
   }, [orderId]);
 
   const fetchOrder = async () => {
@@ -44,10 +45,55 @@ const AdminOrderDetails = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setOrder(response.data);
+      setSelectedDriver(response.data.driver_id || '');
     } catch (error) {
       console.error('Error fetching order:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDrivers = async () => {
+    try {
+      const response = await axios.get(`${API}/admin/drivers`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setDrivers(response.data.drivers || []);
+    } catch (error) {
+      console.error('Error fetching drivers:', error);
+    }
+  };
+
+  const assignDriver = async () => {
+    setAssigningDriver(true);
+    try {
+      const response = await axios.put(
+        `${API}/admin/orders/${orderId}/assign-driver`,
+        { driver_id: selectedDriver || null },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      if (selectedDriver) {
+        const driver = drivers.find(d => d.id === selectedDriver);
+        setOrder(prev => ({ 
+          ...prev, 
+          driver_id: selectedDriver,
+          driver_name: driver?.name
+        }));
+      } else {
+        setOrder(prev => ({ 
+          ...prev, 
+          driver_id: null,
+          driver_name: null
+        }));
+      }
+      
+      alert(t('Livreur assigné avec succès', 'Driver assigned successfully'));
+    } catch (error) {
+      console.error('Error assigning driver:', error);
+      alert(error.response?.data?.detail || t('Erreur lors de l\'assignation', 'Error assigning driver'));
+    } finally {
+      setAssigningDriver(false);
     }
   };
 
