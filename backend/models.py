@@ -108,13 +108,29 @@ class OrderBase(BaseModel):
     delivery_address: str
     phone: str
     payment_method: Literal["cash", "mobile_money"] = "cash"
-    status: Literal["en_attente", "en_preparation", "en_livraison", "livree", "annulee"] = "en_attente"
+    status: Literal["en_attente", "en_preparation", "en_livraison", "livree", "annulee", "echouee"] = "en_attente"
+    # Driver assignment
+    driver_id: Optional[str] = None
+    driver_name: Optional[str] = None
+    # Failure tracking
+    failure_reason: Optional[str] = None  # Predefined reason code
+    failure_details: Optional[str] = None  # Free text for "autre"
 
 class Order(OrderBase):
     model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Delivery failure reasons
+FAILURE_REASONS = [
+    {"code": "client_absent", "fr": "Client absent", "en": "Client absent"},
+    {"code": "adresse_incorrecte", "fr": "Adresse incorrecte / introuvable", "en": "Incorrect / unfound address"},
+    {"code": "client_refuse", "fr": "Client a refusé", "en": "Client refused"},
+    {"code": "stock_indisponible", "fr": "Problème de stock / produit indisponible", "en": "Stock issue / product unavailable"},
+    {"code": "probleme_vehicule", "fr": "Problème véhicule / incident", "en": "Vehicle problem / incident"},
+    {"code": "autre", "fr": "Autre", "en": "Other"},
+]
 
 class CheckoutRequest(BaseModel):
     delivery_address: str
