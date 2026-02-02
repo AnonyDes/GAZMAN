@@ -1062,9 +1062,16 @@ async def driver_get_orders(
     for order in orders:
         customer = await db.users.find_one(
             {"id": order["user_id"]}, 
-            {"_id": 0, "password_hash": 0, "name": 1, "email": 1}
+            {"_id": 0, "password_hash": 0}
         )
-        order["customer"] = customer
+        if customer:
+            # Only include name and email
+            order["customer"] = {
+                "name": customer.get("name"),
+                "email": customer.get("email")
+            }
+        else:
+            order["customer"] = None
     
     # Count by status
     stats = {
