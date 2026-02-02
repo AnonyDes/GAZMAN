@@ -110,51 +110,63 @@ user_problem_statement: |
 backend:
   - task: "Driver API - Get assigned orders"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Driver API endpoints implemented. Need testing."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Driver can successfully retrieve assigned orders. API returns orders with customer info, stats, and proper filtering by driver_id. Fixed MongoDB projection issue in customer enrichment."
 
   - task: "Driver API - Update order status"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Driver can update order status including failure reasons."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Driver status updates working perfectly. Tested complete flow: en_attente → en_preparation → en_livraison → livree. Also tested failure flow with failure_reason. Status transitions properly validated."
 
   - task: "Admin API - Assign driver to order"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Admin can assign/unassign drivers to orders."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin can successfully assign drivers to orders. Order gets driver_id and driver_name fields populated. Assignment verified through order retrieval."
 
   - task: "Admin API - Get list of drivers"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Admin can fetch list of all drivers."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Admin can retrieve complete list of drivers with proper role filtering. Returns driver details without sensitive information."
 
 frontend:
   - task: "Driver Dashboard"
