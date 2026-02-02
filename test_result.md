@@ -177,12 +177,9 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Dashboard shows driver stats and active deliveries."
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Driver dashboard loads correctly with proper French UI, stats display (Total assignées, En cours, Livrées, Échouées), revenue card, and active deliveries section. Navigation and layout working properly."
+        comment: "Dashboard displays stats, revenue card, and active deliveries. French UI verified."
 
   - task: "Driver Orders List"
     implemented: true
