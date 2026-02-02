@@ -56,8 +56,9 @@ const ShoppingCart = () => {
     
     setUpdating(true);
     try {
-      await axios.delete(`${API}/cart/items/${productId}`, {
-        params: { size },
+      // Use URL query string directly for better compatibility
+      const encodedSize = encodeURIComponent(size);
+      await axios.delete(`${API}/cart/items/${productId}?size=${encodedSize}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       await fetchCart();
