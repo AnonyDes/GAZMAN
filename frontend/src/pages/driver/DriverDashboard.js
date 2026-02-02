@@ -129,7 +129,7 @@ const DriverDashboard = () => {
             to="/driver/orders" 
             className="text-green-600 hover:text-green-700 font-semibold text-sm flex items-center"
           >
-            {t('Voir tout', 'View all')}
+            {t('driver.viewAll')}
             <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
@@ -137,7 +137,7 @@ const DriverDashboard = () => {
         {activeOrders.length === 0 ? (
           <div className="p-12 text-center">
             <Package size={48} className="mx-auto text-gray-300 mb-4" />
-            <p className="text-gray-500">{t('Aucune livraison active', 'No active deliveries')}</p>
+            <p className="text-gray-500">{t('driver.noActiveDeliveries')}</p>
           </div>
         ) : (
           <div className="divide-y divide-gray-100">
