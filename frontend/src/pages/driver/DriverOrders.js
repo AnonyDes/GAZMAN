@@ -11,13 +11,11 @@ const API = `${BACKEND_URL}/api`;
 
 const DriverOrders = () => {
   const { token } = useAuth();
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState('');
-
-  const t = (fr, en) => language === 'fr' ? fr : en;
 
   useEffect(() => {
     fetchOrders();
@@ -49,11 +47,11 @@ const DriverOrders = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      en_attente: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('En attente', 'Pending') },
-      en_preparation: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('Préparation', 'Preparing') },
-      en_livraison: { bg: 'bg-purple-100', text: 'text-purple-800', label: t('En livraison', 'Delivering') },
-      livree: { bg: 'bg-green-100', text: 'text-green-800', label: t('Livrée', 'Delivered') },
-      echouee: { bg: 'bg-red-100', text: 'text-red-800', label: t('Échouée', 'Failed') }
+      en_attente: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('driver.pending') },
+      en_preparation: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('driver.preparing') },
+      en_livraison: { bg: 'bg-purple-100', text: 'text-purple-800', label: t('driver.delivering') },
+      livree: { bg: 'bg-green-100', text: 'text-green-800', label: t('status.livree') },
+      echouee: { bg: 'bg-red-100', text: 'text-red-800', label: t('status.echouee') }
     };
     const config = statusConfig[status] || statusConfig.en_attente;
     return (
