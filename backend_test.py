@@ -19,8 +19,8 @@ BASE_URL = os.getenv('REACT_APP_BACKEND_URL', 'https://gazman-ecommerce.preview.
 API_BASE = f"{BASE_URL}/api"
 
 # Test credentials
-ADMIN_CREDENTIALS = {"email": "admin@gazman.cm", "password": "Admin123!"}
-DRIVER_CREDENTIALS = {"email": "driver@gazman.cm", "password": "Driver123!"}
+ADMIN_CREDENTIALS = {"email": "admin@gazman.cm", "password": "CHANGE_ME_IN_PRODUCTION"}
+DRIVER_CREDENTIALS = {"email": "driver@gazman.cm", "password": "CHANGE_ME_IN_PRODUCTION"}
 
 # Global variables for test data
 admin_token = None
