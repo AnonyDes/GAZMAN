@@ -189,12 +189,9 @@ frontend:
     priority: "high"
     needs_retesting: false
     status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Orders list with status filters."
       - working: true
         agent: "testing"
-        comment: "✅ TESTED: Driver orders list page loads correctly with status filters, order cards layout, and navigation. UI components render properly even when no orders are assigned to driver."
+        comment: "Orders list with status filters working correctly."
 
   - task: "Driver Order Details with status update"
     implemented: true
