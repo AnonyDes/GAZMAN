@@ -155,8 +155,8 @@ const Profile = () => {
                 <Globe size={20} className="text-indigo-600" />
               </div>
               <div>
-                <p className="font-semibold text-gray-900">{language === 'fr' ? 'Langue' : 'Language'}</p>
-                <p className="text-sm text-gray-500">{language === 'fr' ? 'Français / English' : 'French / English'}</p>
+                <p className="font-semibold text-gray-900">{t('profile.language')}</p>
+                <p className="text-sm text-gray-500">{t('profile.languageDesc')}</p>
               </div>
             </div>
             <div className="flex bg-gray-100 rounded-xl p-1">
