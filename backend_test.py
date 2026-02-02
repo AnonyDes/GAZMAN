@@ -124,8 +124,8 @@ def test_create_test_client():
     """Register a test client for creating orders."""
     global client_token, client_user_id
     
-    # Generate unique email for test client
-    test_email = f"testclient_{uuid.uuid4().hex[:8]}@gazman.test"
+    # Generate unique email for test client with valid domain
+    test_email = f"testclient_{uuid.uuid4().hex[:8]}@example.com"
     client_data = {
         "name": "Test Client",
         "email": test_email,
