@@ -19,12 +19,10 @@ const API = `${BACKEND_URL}/api`;
 
 const DriverDashboard = () => {
   const { token } = useAuth();
-  const { language } = useLanguage();
+  const { t } = useLanguage();
   const [orders, setOrders] = useState([]);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  const t = (fr, en) => language === 'fr' ? fr : en;
 
   useEffect(() => {
     fetchData();
@@ -47,7 +45,7 @@ const DriverDashboard = () => {
 
   const getStatusBadge = (status) => {
     const statusConfig = {
-      en_attente: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('En attente', 'Pending') },
+      en_attente: { bg: 'bg-yellow-100', text: 'text-yellow-800', label: t('driver.pending') },
       en_preparation: { bg: 'bg-blue-100', text: 'text-blue-800', label: t('Préparation', 'Preparing') },
       en_livraison: { bg: 'bg-purple-100', text: 'text-purple-800', label: t('En livraison', 'Delivering') },
       livree: { bg: 'bg-green-100', text: 'text-green-800', label: t('Livrée', 'Delivered') },
