@@ -236,16 +236,22 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      Fixed cart deletion issue - changed axios DELETE to use URL query string directly.
+      Now running automated driver flow tests.
+      
+      Test flow:
+      1. Admin assigns driver to order
+      2. Driver sees assigned order
+      3. Driver updates order status through progression
+      
+  - agent: "main"
+    message: |
       Phase 4 Driver App is fully implemented. All driver pages and APIs exist.
       Need to test the complete driver flow:
       1. Admin assigns driver to an order
       2. Driver logs in and sees assigned orders
       3. Driver can update order status (en_attente -> en_preparation -> en_livraison -> livree/echouee)
       4. Driver can report delivery failure with reason
-      
-      Test credentials:
-      - Admin: admin@gazman.cm / Admin123!
-      - Driver: driver@gazman.cm / Driver123!
       
       Test backend APIs first with curl, then frontend if needed.
   - agent: "testing"
