@@ -74,10 +74,10 @@ const DriverDashboard = () => {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">
-          {t('Tableau de bord', 'Dashboard')}
+          {t('driver.dashboard')}
         </h1>
         <p className="text-gray-600 mt-1">
-          {t('Bienvenue, livreur!', 'Welcome, driver!')}
+          {t('driver.welcome')}
         </p>
       </div>
 
@@ -88,34 +88,34 @@ const DriverDashboard = () => {
             <Package size={20} className="text-white" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats?.total_assigned || 0}</p>
-          <p className="text-sm text-gray-500">{t('Total assignées', 'Total Assigned')}</p>
+          <p className="text-sm text-gray-500">{t('driver.totalAssigned')}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="w-10 h-10 bg-purple-500 rounded-lg flex items-center justify-center mb-3">
             <Truck size={20} className="text-white" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats?.in_progress || 0}</p>
-          <p className="text-sm text-gray-500">{t('En cours', 'In Progress')}</p>
+          <p className="text-sm text-gray-500">{t('driver.inProgress')}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="w-10 h-10 bg-green-500 rounded-lg flex items-center justify-center mb-3">
             <CheckCircle size={20} className="text-white" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats?.delivered || 0}</p>
-          <p className="text-sm text-gray-500">{t('Livrées', 'Delivered')}</p>
+          <p className="text-sm text-gray-500">{t('driver.delivered')}</p>
         </div>
         <div className="bg-white rounded-xl p-4 shadow-sm">
           <div className="w-10 h-10 bg-red-500 rounded-lg flex items-center justify-center mb-3">
             <XCircle size={20} className="text-white" />
           </div>
           <p className="text-2xl font-bold text-gray-900">{stats?.failed || 0}</p>
-          <p className="text-sm text-gray-500">{t('Échouées', 'Failed')}</p>
+          <p className="text-sm text-gray-500">{t('driver.failed')}</p>
         </div>
       </div>
 
       {/* Revenue Card */}
       <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-xl p-6 text-white mb-8">
-        <p className="text-green-100">{t('Valeur totale livrée', 'Total Delivered Value')}</p>
+        <p className="text-green-100">{t('driver.totalDeliveredValue')}</p>
         <p className="text-3xl font-bold mt-2">{formatCurrency(stats?.total_delivered_value || 0)}</p>
       </div>
 
@@ -123,7 +123,7 @@ const DriverDashboard = () => {
       <div className="bg-white rounded-xl shadow-sm">
         <div className="p-6 border-b border-gray-100 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900">
-            {t('Livraisons actives', 'Active Deliveries')} ({activeOrders.length})
+            {t('driver.activeDeliveries')} ({activeOrders.length})
           </h2>
           <Link 
             to="/driver/orders" 
