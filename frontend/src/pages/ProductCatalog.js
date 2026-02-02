@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
-import { ArrowLeft, Search, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, Search, SlidersHorizontal, Star, Clock } from 'lucide-react';
 import BottomNav from '@/components/BottomNav';
 import { formatCurrency } from '@/utils/currency';
 
@@ -10,8 +11,10 @@ const API = `${BACKEND_URL}/api`;
 
 const ProductCatalog = () => {
   const navigate = useNavigate();
+  const { t, language } = useLanguage();
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get('category') || '';
+  const initialSearch = searchParams.get('search') || '';
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -20,7 +23,7 @@ const ProductCatalog = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   // Filter and search state
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearch);
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedBrand, setSelectedBrand] = useState('');
   const [sortBy, setSortBy] = useState('name');
@@ -29,9 +32,12 @@ const ProductCatalog = () => {
 
   // Get category label
   const getCategoryLabel = () => {
-    if (!selectedCategory) return 'Tous les Produits';
+    if (!selectedCategory) return t('products.title');
     const category = categories.find(cat => cat.value === selectedCategory);
-    return category ? category.label : 'Produits';
+    if (category) {
+      return t(`category.${category.value}`);
+    }
+    return t('products.title');
   };
 
   useEffect(() => {
@@ -92,27 +98,29 @@ const ProductCatalog = () => {
   const activeFiltersCount = [selectedCategory, selectedBrand, minPrice, maxPrice].filter(Boolean).length;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-orange-50 pb-20">
-      {/* Premium Header */}
-      <div className="bg-gradient-to-r from-blue-900 to-blue-800 px-4 pt-6 pb-8 rounded-b-3xl shadow-xl sticky top-0 z-40">
+    <div className="min-h-screen bg-white pb-20">
+      {/* Header */}
+      <div className="bg-white px-4 pt-6 pb-4 border-b border-gray-100 sticky top-0 z-40">
         <div className="flex items-center space-x-3 mb-4">
           <button
             onClick={() => navigate(-1)}
-            className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
+            className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
             data-testid="back-button"
           >
-            <ArrowLeft size={24} className="text-white" />
+            <ArrowLeft size={24} className="text-gray-700" />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-bold text-white">{getCategoryLabel()}</h1>
-            <p className="text-blue-200 text-sm">{products.length} produit{products.length !== 1 ? 's' : ''} disponible{products.length !== 1 ? 's' : ''}</p>
+            <h1 className="text-xl font-bold text-gray-900">{getCategoryLabel()}</h1>
+            <p className="text-gray-500 text-sm">
+              {products.length} {products.length === 1 ? t('products.product') : t('products.products')} {t('products.available')}
+            </p>
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="relative p-2 bg-white/10 rounded-full hover:bg-white/20 transition-colors backdrop-blur-sm"
+            className="relative p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors"
             data-testid="filters-button"
           >
-            <SlidersHorizontal size={24} className="text-white" />
+            <SlidersHorizontal size={24} className="text-gray-700" />
             {activeFiltersCount > 0 && (
               <span className="absolute -top-1 -right-1 w-5 h-5 bg-orange-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
                 {activeFiltersCount}
@@ -128,8 +136,8 @@ const ProductCatalog = () => {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Rechercher un produit..."
-            className="w-full pl-12 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-orange-500 outline-none text-gray-900 placeholder-gray-400"
+            placeholder={t('products.search')}
+            className="w-full pl-12 pr-4 py-3 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 outline-none text-gray-900 placeholder-gray-400"
             data-testid="search-input"
           />
         </div>
@@ -137,36 +145,36 @@ const ProductCatalog = () => {
 
       {/* Filters Panel */}
       {showFilters && (
-        <div className="bg-white px-4 py-6 shadow-lg mx-4 mt-4 rounded-2xl">
+        <div className="bg-white px-4 py-6 shadow-lg mx-4 mt-4 rounded-2xl border border-gray-100">
           {/* Sort By */}
           <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-900 mb-2">Trier par</label>
+            <label className="block text-sm font-bold text-gray-900 mb-2">{t('products.sortBy')}</label>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               data-testid="sort-select"
             >
-              <option value="name">Nom</option>
-              <option value="price">Prix: Croissant</option>
-              <option value="-price">Prix: Décroissant</option>
-              <option value="-rating">Meilleure Note</option>
+              <option value="name">{t('products.sortName')}</option>
+              <option value="price">{t('products.sortPriceAsc')}</option>
+              <option value="-price">{t('products.sortPriceDesc')}</option>
+              <option value="-rating">{t('products.sortRating')}</option>
             </select>
           </div>
 
           {/* Category Filter */}
           <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-900 mb-2">Catégorie</label>
+            <label className="block text-sm font-bold text-gray-900 mb-2">{t('products.category')}</label>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               data-testid="category-filter"
             >
-              <option value="">Toutes les catégories</option>
+              <option value="">{t('products.allCategories')}</option>
               {categories.map((cat) => (
                 <option key={cat.value} value={cat.value}>
-                  {cat.label}
+                  {t(`category.${cat.value}`)}
                 </option>
               ))}
             </select>
@@ -174,14 +182,14 @@ const ProductCatalog = () => {
 
           {/* Brand Filter */}
           <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-900 mb-2">Marque</label>
+            <label className="block text-sm font-bold text-gray-900 mb-2">{t('products.brand')}</label>
             <select
               value={selectedBrand}
               onChange={(e) => setSelectedBrand(e.target.value)}
               className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
               data-testid="brand-filter"
             >
-              <option value="">Toutes les marques</option>
+              <option value="">{t('products.allBrands')}</option>
               {brands.map((brand) => (
                 <option key={brand} value={brand}>
                   {brand}
@@ -192,13 +200,13 @@ const ProductCatalog = () => {
 
           {/* Price Range */}
           <div className="mb-4">
-            <label className="block text-sm font-bold text-gray-900 mb-2">Plage de Prix (FCFA)</label>
+            <label className="block text-sm font-bold text-gray-900 mb-2">{t('products.priceRange')}</label>
             <div className="flex space-x-2">
               <input
                 type="number"
                 value={minPrice}
                 onChange={(e) => setMinPrice(e.target.value)}
-                placeholder="Min"
+                placeholder={t('products.min')}
                 className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                 data-testid="min-price-input"
               />
@@ -206,7 +214,7 @@ const ProductCatalog = () => {
                 type="number"
                 value={maxPrice}
                 onChange={(e) => setMaxPrice(e.target.value)}
-                placeholder="Max"
+                placeholder={t('products.max')}
                 className="flex-1 px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none"
                 data-testid="max-price-input"
               />
@@ -220,7 +228,7 @@ const ProductCatalog = () => {
               className="w-full py-3 text-orange-600 font-bold hover:bg-orange-50 rounded-xl transition-colors border-2 border-orange-200"
               data-testid="clear-filters-button"
             >
-              Réinitialiser les filtres
+              {t('products.clearFilters')}
             </button>
           )}
         </div>
@@ -233,12 +241,12 @@ const ProductCatalog = () => {
         </div>
       ) : products.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 px-4">
-          <div className="w-24 h-24 bg-gray-200 rounded-full flex items-center justify-center mb-4">
+          <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
             <Search size={40} className="text-gray-400" />
           </div>
-          <p className="text-gray-900 font-bold text-center text-lg mb-2">Aucun produit trouvé</p>
+          <p className="text-gray-900 font-bold text-center text-lg mb-2">{t('products.noResults')}</p>
           <p className="text-gray-500 text-center text-sm">
-            Essayez d'ajuster vos filtres ou termes de recherche
+            {t('products.noResultsDesc')}
           </p>
         </div>
       ) : (
@@ -248,53 +256,39 @@ const ProductCatalog = () => {
               <button
                 key={product.id}
                 onClick={() => navigate(`/products/${product.id}`)}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all overflow-hidden text-left active:scale-95"
-                data-testid={`product-card-${product.id}`}
+                className="bg-white rounded-2xl shadow-md overflow-hidden text-left hover:shadow-lg transition-all border border-gray-100"
+                data-testid={`product-${product.id}`}
               >
-                {/* Product Image with Badge */}
-                <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4">
+                <div className="relative">
                   <img
-                    src={product.image_url}
+                    src={product.image_url || 'https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=300&h=200&fit=crop'}
                     alt={product.name}
-                    className="w-full h-full object-contain"
+                    className="w-full h-32 object-cover"
                   />
-                  {product.rating >= 4.7 && (
-                    <div className="absolute top-2 right-2 bg-orange-500 text-white px-2 py-1 rounded-lg text-xs font-bold flex items-center space-x-1">
-                      <span>⭐</span>
-                      <span>{product.rating}</span>
-                    </div>
-                  )}
+                  <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center space-x-1">
+                    <Clock size={12} className="text-gray-600" />
+                    <span className="text-xs font-medium text-gray-700">{product.delivery_time || '15-20 min'}</span>
+                  </div>
+                  <button className="absolute top-2 right-2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-md">
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  </button>
                 </div>
-                
-                {/* Product Info */}
-                <div className="p-4">
-                  <div className="flex items-center mb-2">
-                    <span className="inline-block bg-blue-100 text-blue-900 px-2 py-1 rounded-lg text-xs font-bold mr-2">
-                      {product.brand}
+                <div className="p-3">
+                  <div className="flex items-center space-x-1 mb-1">
+                    <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full font-medium">
+                      {t(`category.${product.category}`)}
                     </span>
                   </div>
-                  <h3 className="font-bold text-sm text-gray-900 mb-1 line-clamp-2">
-                    {product.name}
-                  </h3>
-                  <p className="text-xs text-gray-500 mb-3 flex items-center">
-                    <span className="mr-1">📦</span>
-                    {product.capacity}
-                  </p>
+                  <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">{product.name}</h3>
+                  <p className="text-gray-500 text-xs mb-2 line-clamp-1">{product.brand}</p>
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-orange-600 font-bold text-lg">
-                        {formatCurrency(product.price)}
-                      </p>
+                    <span className="text-orange-600 font-bold">{formatCurrency(product.price)}</span>
+                    <div className="flex items-center space-x-1">
+                      <Star size={12} className="text-yellow-400 fill-current" />
+                      <span className="text-xs text-gray-600">{product.rating || '4.8'}</span>
                     </div>
-                    <div className="bg-orange-500 text-white w-8 h-8 rounded-lg flex items-center justify-center">
-                      <span className="text-lg font-bold">+</span>
-                    </div>
-                  </div>
-                  <div className="mt-2 text-xs text-gray-500 flex items-center">
-                    <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    {product.delivery_time}
                   </div>
                 </div>
               </button>
