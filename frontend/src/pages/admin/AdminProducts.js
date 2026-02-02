@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
-import { Plus, Edit2, Trash2, Package, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Package, X, Search } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -10,13 +10,15 @@ const API = `${BACKEND_URL}/api`;
 
 const AdminProducts = () => {
   const { token } = useAuth();
-  const { language } = useLanguage();
+  const { t, language } = useLanguage();
   const [products, setProducts] = useState([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterCategory, setFilterCategory] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     brand: '',
@@ -29,8 +31,6 @@ const AdminProducts = () => {
     description: '',
     delivery_time: '15-20 min'
   });
-
-  const t = (fr, en) => language === 'fr' ? fr : en;
 
   useEffect(() => {
     fetchProducts();
@@ -113,14 +113,14 @@ const AdminProducts = () => {
       setShowModal(false);
     } catch (error) {
       console.error('Error saving product:', error);
-      alert(t('Erreur lors de la sauvegarde', 'Error saving product'));
+      alert(t('admin.saveError'));
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (productId) => {
-    if (!window.confirm(t('Êtes-vous sûr de vouloir supprimer ce produit?', 'Are you sure you want to delete this product?'))) {
+    if (!window.confirm(t('admin.deleteConfirm'))) {
       return;
     }
 
@@ -131,7 +131,7 @@ const AdminProducts = () => {
       await fetchProducts();
     } catch (error) {
       console.error('Error deleting product:', error);
-      alert(t('Erreur lors de la suppression', 'Error deleting product'));
+      alert(t('admin.deleteError'));
     }
   };
 
@@ -141,17 +141,28 @@ const AdminProducts = () => {
   };
 
   const categoryOptions = [
-    { value: 'domestic', label: t('Domestique', 'Domestic') },
-    { value: 'industrial', label: t('Industriel', 'Industrial') },
-    { value: 'refill', label: t('Recharge', 'Refill') },
-    { value: 'rental', label: t('Location', 'Rental') },
+    { value: 'domestic', label: t('category.domestic') },
+    { value: 'industrial', label: t('category.industrial') },
+    { value: 'refill', label: t('category.refill') },
+    { value: 'rental', label: t('category.rental') },
+    { value: 'installation', label: t('category.installation') },
+    { value: 'emergency', label: t('category.emergency') },
   ];
 
   const sizeOptions = [
-    { value: 'small', label: t('Petit', 'Small') },
-    { value: 'medium', label: t('Moyen', 'Medium') },
-    { value: 'large', label: t('Grand', 'Large') },
+    { value: 'small', label: t('size.small') },
+    { value: 'medium', label: t('size.medium') },
+    { value: 'large', label: t('size.large') },
   ];
+
+  // Filter products based on search and category
+  const filteredProducts = products.filter(product => {
+    const matchesSearch = searchQuery === '' || 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = filterCategory === '' || product.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   if (loading) {
     return (
@@ -167,10 +178,10 @@ const AdminProducts = () => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">
-            {t('Produits', 'Products')}
+            {t('admin.products')}
           </h1>
           <p className="text-gray-600 mt-1">
-            {total} {t('produits au total', 'total products')}
+            {total} {t('admin.totalProductsCount')}
           </p>
         </div>
         <button
@@ -178,13 +189,41 @@ const AdminProducts = () => {
           className="flex items-center space-x-2 bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-medium transition-colors"
         >
           <Plus size={20} />
-          <span>{t('Ajouter', 'Add')}</span>
+          <span>{t('common.add')}</span>
         </button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-xl shadow-sm p-4 mb-6">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search */}
+          <div className="flex-1 relative">
+            <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={t('products.search')}
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+            />
+          </div>
+          {/* Category Filter */}
+          <select
+            value={filterCategory}
+            onChange={(e) => setFilterCategory(e.target.value)}
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+          >
+            <option value="">{t('category.all')}</option>
+            {categoryOptions.map(opt => (
+              <option key={opt.value} value={opt.value}>{opt.label}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {/* Products Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {products.map((product) => (
+        {filteredProducts.map((product) => (
           <div key={product.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
             <div className="aspect-video bg-gray-100 flex items-center justify-center">
               {product.image_url ? (
@@ -204,8 +243,14 @@ const AdminProducts = () => {
                   <p className="text-sm text-gray-500">{product.brand}</p>
                 </div>
                 <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                  {product.category}
+                  {t(`category.${product.category}`)}
                 </span>
+              </div>
+              <div className="flex items-center space-x-2 mb-2">
+                <span className="text-xs px-2 py-1 bg-gray-100 text-gray-600 rounded">
+                  {t(`size.${product.size}`)}
+                </span>
+                <span className="text-xs text-gray-500">{product.capacity}</span>
               </div>
               <div className="flex items-center justify-between mb-4">
                 <p className="text-lg font-bold text-orange-600">{formatCurrency(product.price)}</p>
@@ -219,7 +264,7 @@ const AdminProducts = () => {
                   className="flex-1 flex items-center justify-center space-x-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
                 >
                   <Edit2 size={16} />
-                  <span>{t('Modifier', 'Edit')}</span>
+                  <span>{t('common.edit')}</span>
                 </button>
                 <button
                   onClick={() => handleDelete(product.id)}
@@ -233,10 +278,10 @@ const AdminProducts = () => {
         ))}
       </div>
 
-      {products.length === 0 && (
+      {filteredProducts.length === 0 && (
         <div className="text-center py-12 bg-white rounded-xl">
           <Package size={48} className="mx-auto text-gray-300 mb-4" />
-          <p className="text-gray-500">{t('Aucun produit trouvé', 'No products found')}</p>
+          <p className="text-gray-500">{t('admin.noProducts')}</p>
         </div>
       )}
 
@@ -246,7 +291,7 @@ const AdminProducts = () => {
           <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <h2 className="text-xl font-bold text-gray-900">
-                {editingProduct ? t('Modifier le produit', 'Edit Product') : t('Nouveau produit', 'New Product')}
+                {editingProduct ? t('admin.editProduct') : t('admin.newProduct')}
               </h2>
               <button
                 onClick={() => setShowModal(false)}
@@ -260,7 +305,7 @@ const AdminProducts = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('Nom', 'Name')} *
+                    {t('admin.productName')} *
                   </label>
                   <input
                     type="text"
@@ -273,7 +318,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('Marque', 'Brand')} *
+                    {t('admin.productBrand')} *
                   </label>
                   <input
                     type="text"
@@ -289,7 +334,7 @@ const AdminProducts = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('Catégorie', 'Category')}
+                    {t('admin.productCategory')}
                   </label>
                   <select
                     name="category"
@@ -304,7 +349,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('Taille', 'Size')}
+                    {t('admin.productSize')}
                   </label>
                   <select
                     name="size"
@@ -322,7 +367,7 @@ const AdminProducts = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    {t('Prix (FCFA)', 'Price (FCFA)')} *
+                    {t('admin.productPrice')} *
                   </label>
                   <input
                     type="number"
@@ -336,7 +381,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Stock *
+                    {t('admin.productStock')} *
                   </label>
                   <input
                     type="number"
@@ -352,7 +397,7 @@ const AdminProducts = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('Capacité', 'Capacity')}
+                  {t('admin.productCapacity')}
                 </label>
                 <input
                   type="text"
@@ -366,7 +411,7 @@ const AdminProducts = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('URL de l\'image', 'Image URL')}
+                  {t('admin.productImageUrl')}
                 </label>
                 <input
                   type="url"
@@ -380,7 +425,7 @@ const AdminProducts = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
+                  {t('admin.productDescription')}
                 </label>
                 <textarea
                   name="description"
@@ -397,14 +442,14 @@ const AdminProducts = () => {
                   onClick={() => setShowModal(false)}
                   className="flex-1 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
                 >
-                  {t('Annuler', 'Cancel')}
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
                   className="flex-1 py-3 bg-orange-500 hover:bg-orange-600 text-white rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  {saving ? t('Sauvegarde...', 'Saving...') : t('Sauvegarder', 'Save')}
+                  {saving ? t('admin.saving') : t('common.save')}
                 </button>
               </div>
             </form>
