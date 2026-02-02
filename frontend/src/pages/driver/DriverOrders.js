@@ -62,12 +62,12 @@ const DriverOrders = () => {
   };
 
   const statusOptions = [
-    { value: '', label: t('Tous', 'All'), count: stats.total },
-    { value: 'en_attente', label: t('En attente', 'Pending'), count: stats.pending },
-    { value: 'en_preparation', label: t('Préparation', 'Preparing'), count: stats.preparing },
-    { value: 'en_livraison', label: t('En livraison', 'Delivering'), count: stats.delivering },
-    { value: 'livree', label: t('Livrées', 'Delivered'), count: stats.delivered },
-    { value: 'echouee', label: t('Échouées', 'Failed'), count: stats.failed },
+    { value: '', label: t('common.all'), count: stats.total },
+    { value: 'en_attente', label: t('driver.pending'), count: stats.pending },
+    { value: 'en_preparation', label: t('driver.preparing'), count: stats.preparing },
+    { value: 'en_livraison', label: t('driver.delivering'), count: stats.delivering },
+    { value: 'livree', label: t('driver.delivered'), count: stats.delivered },
+    { value: 'echouee', label: t('driver.failed'), count: stats.failed },
   ];
 
   const filteredOrders = statusFilter 
@@ -87,10 +87,10 @@ const DriverOrders = () => {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">
-          {t('Mes Livraisons', 'My Deliveries')}
+          {t('driver.myDeliveries')}
         </h1>
         <p className="text-gray-600 mt-1">
-          {stats.total || 0} {t('livraisons assignées', 'assigned deliveries')}
+          {stats.total || 0} {t('driver.assignedDeliveries')}
         </p>
       </div>
 
@@ -117,7 +117,7 @@ const DriverOrders = () => {
       {filteredOrders.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm p-12 text-center">
           <Package size={48} className="mx-auto text-gray-300 mb-4" />
-          <p className="text-gray-500">{t('Aucune livraison trouvée', 'No deliveries found')}</p>
+          <p className="text-gray-500">{t('driver.noDeliveriesFound')}</p>
         </div>
       ) : (
         <div className="space-y-4">
