@@ -286,10 +286,10 @@ const AdminSettings = () => {
           <h3 className="text-lg font-bold text-gray-700 mb-4">
             {language === 'fr' ? 'Aperçu' : 'Preview'}
           </h3>
-          <div className="bg-gradient-to-r from-[#FFC800] to-[#FFD84D] rounded-xl p-6 text-center">
-            <h4 className="text-2xl font-bold text-[#0F357F] mb-2">{settings.hero_title}</h4>
-            <p className="text-[#0F357F]/80 mb-4 text-sm">{settings.hero_subtitle}</p>
-            <button className="bg-[#0F357F] text-white px-4 py-2 rounded-lg font-bold text-sm">
+          <div className="bg-gradient-to-r from-[#0F357F] to-[#007DFF] rounded-xl p-6 text-center">
+            <h4 className="text-2xl font-bold text-white mb-2">{settings.hero_title}</h4>
+            <p className="text-blue-100 mb-4 text-sm">{settings.hero_subtitle}</p>
+            <button className="bg-[#FF6B35] text-white px-4 py-2 rounded-lg font-bold text-sm">
               {settings.hero_cta}
             </button>
           </div>
