@@ -10,6 +10,9 @@ import { formatCurrency } from '@/utils/currency';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Logo URL
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0kss4yf8_gazman_icon.png';
+
 const Homepage = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -59,20 +62,20 @@ const Homepage = () => {
     emergency: '🚨'
   };
 
-  // Category background colors
+  // Category background colors (blue/orange theme)
   const categoryColors = {
-    domestic: 'bg-orange-50',
-    industrial: 'bg-blue-50',
+    domestic: 'bg-blue-50',
+    industrial: 'bg-slate-50',
     refill: 'bg-green-50',
     rental: 'bg-purple-50',
-    installation: 'bg-yellow-50',
+    installation: 'bg-orange-50',
     emergency: 'bg-red-50'
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0F357F]"></div>
       </div>
     );
   }
@@ -83,7 +86,7 @@ const Homepage = () => {
       <div className="px-4 pt-6 pb-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
+            <div className="w-12 h-12 bg-gradient-to-br from-[#0F357F] to-[#007DFF] rounded-full flex items-center justify-center text-white font-bold text-xl shadow-md">
               {user?.name?.charAt(0) || 'U'}
             </div>
             <div>
@@ -96,13 +99,13 @@ const Homepage = () => {
             data-testid="notifications-button"
           >
             <Bell size={22} className="text-gray-700" />
-            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-orange-500 rounded-full border-2 border-white"></span>
+            <span className="absolute top-2 right-2 w-2.5 h-2.5 bg-[#FF6B35] rounded-full border-2 border-white"></span>
           </button>
         </div>
 
         {/* Location */}
         <div className="flex items-center space-x-2 mb-6">
-          <MapPin size={18} className="text-orange-500 flex-shrink-0" />
+          <MapPin size={18} className="text-[#FF6B35] flex-shrink-0" />
           <span className="text-gray-700 text-sm flex-1 truncate">
             {user?.address || t('home.addDeliveryAddress')}
           </span>
@@ -118,7 +121,7 @@ const Homepage = () => {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder={t('home.searchPlaceholder')}
-            className="w-full pl-4 pr-12 py-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-orange-500 outline-none text-gray-900 placeholder-gray-400"
+            className="w-full pl-4 pr-12 py-4 bg-gray-100 rounded-2xl border-none focus:ring-2 focus:ring-[#007DFF] outline-none text-gray-900 placeholder-gray-400"
             data-testid="search-input"
           />
           <button 
@@ -132,7 +135,7 @@ const Homepage = () => {
 
       {/* Promotional Banner */}
       <div className="px-4 mb-6">
-        <div className="bg-gradient-to-r from-orange-500 to-orange-600 rounded-3xl p-6 shadow-lg relative overflow-hidden" data-testid="hero-section">
+        <div className="bg-gradient-to-r from-[#0F357F] to-[#007DFF] rounded-3xl p-6 shadow-lg relative overflow-hidden" data-testid="hero-section">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10"></div>
           <div className="absolute bottom-0 right-20 w-20 h-20 bg-white/10 rounded-full mb-2"></div>
@@ -142,12 +145,12 @@ const Homepage = () => {
               <h3 className="text-white text-xl font-bold mb-1">
                 {t('home.fastBites')}
               </h3>
-              <p className="text-orange-100 text-sm mb-4">
+              <p className="text-blue-100 text-sm mb-4">
                 {t('home.upTo3Times')}
               </p>
               <button
                 onClick={() => navigate('/products')}
-                className="bg-white text-orange-600 px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg transition-all"
+                className="bg-[#FF6B35] text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:shadow-lg transition-all"
                 data-testid="hero-cta-button"
               >
                 {t('home.orderNow')}
@@ -155,9 +158,9 @@ const Homepage = () => {
             </div>
             <div className="w-24 h-24 flex-shrink-0">
               <img 
-                src="https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=200&h=200&fit=crop"
-                alt="Gas Cylinder"
-                className="w-full h-full object-cover rounded-2xl"
+                src={LOGO_URL}
+                alt="GAZMAN"
+                className="w-full h-full object-contain"
               />
             </div>
           </div>
@@ -170,7 +173,7 @@ const Homepage = () => {
           <h2 className="text-lg font-bold text-gray-900">{t('home.serviceCategories')}</h2>
           <button 
             onClick={() => navigate('/products')}
-            className="text-orange-500 text-sm font-semibold hover:text-orange-600"
+            className="text-[#007DFF] text-sm font-semibold hover:text-[#0F357F]"
           >
             {t('home.seeMore')}
           </button>
@@ -200,7 +203,7 @@ const Homepage = () => {
           <h2 className="text-lg font-bold text-gray-900">{t('home.popularProducts')}</h2>
           <button 
             onClick={() => navigate('/products')}
-            className="text-orange-500 text-sm font-semibold hover:text-orange-600"
+            className="text-[#007DFF] text-sm font-semibold hover:text-[#0F357F]"
           >
             {t('home.seeMore')}
           </button>
@@ -233,9 +236,9 @@ const Homepage = () => {
                 <h3 className="font-bold text-gray-900 text-sm mb-1 line-clamp-1">{product.name}</h3>
                 <p className="text-gray-500 text-xs mb-2 line-clamp-1">{product.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-orange-600 font-bold">{formatCurrency(product.price)}</span>
+                  <span className="text-[#0F357F] font-bold">{formatCurrency(product.price)}</span>
                   <div className="flex items-center space-x-1">
-                    <Star size={12} className="text-yellow-400 fill-current" />
+                    <Star size={12} className="text-[#FF6B35] fill-current" />
                     <span className="text-xs text-gray-600">{product.rating || '4.8'}</span>
                   </div>
                 </div>
@@ -247,7 +250,7 @@ const Homepage = () => {
 
       {/* Service Status Card */}
       <div className="px-4 mb-6">
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-5 shadow-lg">
+        <div className="bg-gradient-to-r from-[#0F357F] to-[#007DFF] rounded-2xl p-5 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
