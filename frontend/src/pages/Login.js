@@ -4,6 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
+// Logo URL
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0kss4yf8_gazman_icon.png';
+
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,7 +58,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F357F] via-[#007DFF] to-[#0F357F] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0F357F] via-[#1a4a9e] to-[#007DFF] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8" data-testid="login-page">
         {/* Back Button */}
         <button
@@ -68,10 +71,12 @@ const Login = () => {
 
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-[#FFC800] to-[#FFD84D] rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg">
-            <span className="text-3xl">🔥</span>
-          </div>
-          <h1 className="text-3xl font-bold text-[#0F357F]">GAZ MAN</h1>
+          <img 
+            src={LOGO_URL} 
+            alt="GAZMAN" 
+            className="w-20 h-20 mx-auto mb-4 object-contain"
+          />
+          <h1 className="text-3xl font-bold text-[#0F357F]">GAZMAN</h1>
           <p className="text-gray-600 mt-2">
             {language === 'fr' ? 'Content de vous revoir!' : 'Welcome back!'}
           </p>
