@@ -1177,6 +1177,58 @@ async def driver_get_stats(driver: User = Depends(get_driver_user)):
     }
 
 # ============================================
+# Site Settings Endpoints (Public + Admin)
+# ============================================
+
+# Default site settings
+DEFAULT_SITE_SETTINGS = {
+    "hero_title": "Votre gaz livré en un clic",
+    "hero_subtitle": "Commandez votre bouteille de gaz et recevez-la chez vous en moins de 30 minutes, partout à Yaoundé et Douala.",
+    "hero_cta": "Commander maintenant",
+    "promo_title": "Livraison Express",
+    "promo_subtitle": "Livraison gratuite pour toute commande supérieure à 20 000 FCFA",
+    "service_hours": "Lun - Dim, 8h00 - 22h00"
+}
+
+@api_router.get("/site-settings")
+async def get_site_settings():
+    """Get public site settings for the landing page."""
+    settings = await db.site_settings.find_one({"id": "main"}, {"_id": 0})
+    if settings:
+        return {**DEFAULT_SITE_SETTINGS, **settings}
+    return DEFAULT_SITE_SETTINGS
+
+@api_router.put("/admin/site-settings")
+async def update_site_settings(
+    settings: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Update site settings (admin only)."""
+    # Validate allowed fields
+    allowed_fields = {"hero_title", "hero_subtitle", "hero_cta", "promo_title", "promo_subtitle", "service_hours"}
+    filtered_settings = {k: v for k, v in settings.items() if k in allowed_fields}
+    
+    # Add metadata
+    filtered_settings["id"] = "main"
+    filtered_settings["updated_at"] = datetime.utcnow().isoformat()
+    filtered_settings["updated_by"] = admin.id
+    
+    # Upsert settings
+    await db.site_settings.update_one(
+        {"id": "main"},
+        {"$set": filtered_settings},
+        upsert=True
+    )
+    
+    return {"message": "Settings updated successfully"}
+
+@api_router.delete("/admin/site-settings")
+async def reset_site_settings(admin: User = Depends(get_admin_user)):
+    """Reset site settings to defaults (admin only)."""
+    await db.site_settings.delete_one({"id": "main"})
+    return {"message": "Settings reset to defaults"}
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
