@@ -18,6 +18,9 @@ import {
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Logo URL
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0kss4yf8_gazman_icon.png';
+
 // Default site settings
 const defaultSettings = {
   hero_title: 'Votre gaz livré en un clic',
@@ -88,10 +91,10 @@ const LandingPage = () => {
     }
   };
 
-  // Category icons and colors based on brand
+  // Category icons and colors based on brand (blue/orange theme)
   const categoryConfig = {
     domestic: { icon: '🏠', bg: 'bg-blue-50', border: 'border-blue-200' },
-    industrial: { icon: '🏭', bg: 'bg-amber-50', border: 'border-amber-200' },
+    industrial: { icon: '🏭', bg: 'bg-slate-50', border: 'border-slate-200' },
     refill: { icon: '♻️', bg: 'bg-green-50', border: 'border-green-200' },
     rental: { icon: '🔄', bg: 'bg-purple-50', border: 'border-purple-200' },
     installation: { icon: '🔧', bg: 'bg-orange-50', border: 'border-orange-200' },
@@ -101,15 +104,17 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-gradient-to-r from-[#0F357F] to-[#007DFF] text-white">
+      <header className="bg-gradient-to-r from-[#0F357F] to-[#1a4a9e] text-white">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             {/* Logo */}
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                <span className="text-2xl">🔥</span>
-              </div>
-              <span className="text-2xl font-bold">GAZ MAN</span>
+              <img 
+                src={LOGO_URL} 
+                alt="GAZMAN Logo" 
+                className="w-10 h-10 object-contain"
+              />
+              <span className="text-2xl font-bold">GAZMAN</span>
             </div>
 
             {/* Nav */}
@@ -138,7 +143,7 @@ const LandingPage = () => {
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-[#FFC800] text-[#0F357F] hover:bg-yellow-300 px-4 py-2 rounded-lg font-bold transition-colors"
+                    className="bg-[#FF6B35] text-white hover:bg-[#e55a2b] px-4 py-2 rounded-lg font-bold transition-colors"
                   >
                     Créer un compte
                   </Link>
@@ -157,7 +162,7 @@ const LandingPage = () => {
               {!isAuthenticated && (
                 <Link
                   to="/login"
-                  className="bg-[#FFC800] text-[#0F357F] px-3 py-1.5 rounded-lg font-bold text-sm"
+                  className="bg-[#FF6B35] text-white px-3 py-1.5 rounded-lg font-bold text-sm"
                 >
                   Connexion
                 </Link>
@@ -167,14 +172,25 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#FFC800] via-[#FFD84D] to-[#FFE680] py-16 md:py-24">
-        <div className="max-w-7xl mx-auto px-4">
+      {/* Hero Section - Blue/White theme */}
+      <section className="bg-gradient-to-br from-[#0F357F] via-[#1a4a9e] to-[#007DFF] py-16 md:py-24 relative overflow-hidden">
+        {/* Decorative elements */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48"></div>
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-[#0F357F] mb-6 leading-tight">
+            <div className="mb-6">
+              <img 
+                src={LOGO_URL} 
+                alt="GAZMAN" 
+                className="w-24 h-24 mx-auto object-contain"
+              />
+            </div>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               {settings.hero_title}
             </h1>
-            <p className="text-lg md:text-xl text-[#0F357F]/80 mb-8 leading-relaxed">
+            <p className="text-lg md:text-xl text-blue-100 mb-8 leading-relaxed">
               {settings.hero_subtitle}
             </p>
             
@@ -187,11 +203,11 @@ const LandingPage = () => {
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder={language === 'fr' ? 'Rechercher "Bouteille de gaz"' : 'Search "Gas Cylinder"'}
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-white bg-white shadow-lg text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-[#007DFF]/30 focus:border-[#007DFF] outline-none transition-all"
+                  className="w-full pl-12 pr-4 py-4 rounded-2xl border-2 border-white/20 bg-white shadow-lg text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-[#FF6B35]/30 focus:border-[#FF6B35] outline-none transition-all"
                 />
                 <button
                   type="submit"
-                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#0F357F] hover:bg-[#007DFF] text-white p-2 rounded-xl transition-colors"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#FF6B35] hover:bg-[#e55a2b] text-white p-2 rounded-xl transition-colors"
                 >
                   <Search size={20} />
                 </button>
@@ -201,7 +217,7 @@ const LandingPage = () => {
             {/* CTA Button */}
             <button
               onClick={handleOrderNow}
-              className="bg-[#0F357F] hover:bg-[#007DFF] text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 inline-flex items-center space-x-2"
+              className="bg-[#FF6B35] hover:bg-[#e55a2b] text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl hover:shadow-2xl transition-all transform hover:scale-105 inline-flex items-center space-x-2"
             >
               <span>{settings.hero_cta}</span>
               <ChevronRight size={24} />
@@ -249,7 +265,7 @@ const LandingPage = () => {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[#0F357F] mb-4">
-              {language === 'fr' ? 'Pourquoi choisir GAZ MAN?' : 'Why choose GAZ MAN?'}
+              {language === 'fr' ? 'Pourquoi choisir GAZMAN?' : 'Why choose GAZMAN?'}
             </h2>
           </div>
 
@@ -270,9 +286,9 @@ const LandingPage = () => {
             </div>
 
             {/* Feature 2 */}
-            <div className="bg-gradient-to-br from-amber-50 to-white rounded-2xl p-8 border border-amber-100">
-              <div className="w-16 h-16 bg-[#FFC800] rounded-2xl flex items-center justify-center mb-6">
-                <Shield size={32} className="text-[#0F357F]" />
+            <div className="bg-gradient-to-br from-orange-50 to-white rounded-2xl p-8 border border-orange-100">
+              <div className="w-16 h-16 bg-[#FF6B35] rounded-2xl flex items-center justify-center mb-6">
+                <Shield size={32} className="text-white" />
               </div>
               <h3 className="text-xl font-bold text-[#0F357F] mb-3">
                 {language === 'fr' ? 'Qualité Garantie' : 'Quality Guaranteed'}
@@ -333,19 +349,19 @@ const LandingPage = () => {
       {/* Promo Banner */}
       <section className="py-12 bg-white">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="bg-gradient-to-r from-[#FFC800] to-[#FFD84D] rounded-3xl p-8 md:p-12">
+          <div className="bg-gradient-to-r from-[#FF6B35] to-[#ff8a5c] rounded-3xl p-8 md:p-12">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0">
-                <h3 className="text-2xl md:text-3xl font-bold text-[#0F357F] mb-2">
+                <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">
                   {settings.promo_title}
                 </h3>
-                <p className="text-[#0F357F]/80 text-lg">
+                <p className="text-white/90 text-lg">
                   {settings.promo_subtitle}
                 </p>
               </div>
               <button
                 onClick={handleOrderNow}
-                className="bg-[#0F357F] hover:bg-[#007DFF] text-white px-6 py-3 rounded-xl font-bold transition-colors whitespace-nowrap"
+                className="bg-white hover:bg-gray-100 text-[#FF6B35] px-6 py-3 rounded-xl font-bold transition-colors whitespace-nowrap"
               >
                 {language === 'fr' ? 'En profiter' : 'Take advantage'}
               </button>
@@ -363,7 +379,7 @@ const LandingPage = () => {
               <span className="font-medium">{language === 'fr' ? 'Paiement sécurisé' : 'Secure payment'}</span>
             </div>
             <div className="flex items-center space-x-2 text-gray-600">
-              <Star size={24} className="text-yellow-500 fill-current" />
+              <Star size={24} className="text-[#FF6B35] fill-current" />
               <span className="font-medium">{language === 'fr' ? '+5000 clients satisfaits' : '+5000 satisfied customers'}</span>
             </div>
             <div className="flex items-center space-x-2 text-gray-600">
@@ -381,10 +397,12 @@ const LandingPage = () => {
             {/* Brand */}
             <div>
               <div className="flex items-center space-x-2 mb-4">
-                <div className="w-10 h-10 bg-[#FFC800] rounded-lg flex items-center justify-center">
-                  <span className="text-2xl">🔥</span>
-                </div>
-                <span className="text-2xl font-bold">GAZ MAN</span>
+                <img 
+                  src={LOGO_URL} 
+                  alt="GAZMAN" 
+                  className="w-10 h-10 object-contain bg-white rounded-lg p-1"
+                />
+                <span className="text-2xl font-bold">GAZMAN</span>
               </div>
               <p className="text-blue-200 text-sm">
                 {language === 'fr' 
@@ -426,7 +444,7 @@ const LandingPage = () => {
           </div>
 
           <div className="border-t border-blue-800 mt-8 pt-8 text-center text-blue-300 text-sm">
-            © 2026 GAZ MAN. {language === 'fr' ? 'Tous droits réservés.' : 'All rights reserved.'}
+            © 2026 GAZMAN. {language === 'fr' ? 'Tous droits réservés.' : 'All rights reserved.'}
           </div>
         </div>
       </footer>
