@@ -4,6 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Eye, EyeOff, Check, X, ArrowLeft } from 'lucide-react';
 
+// Logo URL
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0kss4yf8_gazman_icon.png';
+
 const Register = () => {
   const navigate = useNavigate();
   const { register } = useAuth();
@@ -83,7 +86,7 @@ const Register = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F357F] via-[#007DFF] to-[#0F357F] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0F357F] via-[#1a4a9e] to-[#007DFF] flex items-center justify-center p-4">
       <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-8 my-8" data-testid="register-page">
         {/* Back Button */}
         <button
@@ -96,14 +99,16 @@ const Register = () => {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-[#FFC800] to-[#FFD84D] rounded-2xl mx-auto flex items-center justify-center mb-4 shadow-lg">
-            <span className="text-3xl">🔥</span>
-          </div>
+          <img 
+            src={LOGO_URL} 
+            alt="GAZMAN" 
+            className="w-20 h-20 mx-auto mb-4 object-contain"
+          />
           <h1 className="text-3xl font-bold text-[#0F357F]">
             {language === 'fr' ? 'Créer un compte' : 'Create Account'}
           </h1>
           <p className="text-gray-600 mt-2">
-            {language === 'fr' ? 'Rejoignez GAZ MAN aujourd\'hui' : 'Join GAZ MAN today'}
+            {language === 'fr' ? 'Rejoignez GAZMAN aujourd\'hui' : 'Join GAZMAN today'}
           </p>
         </div>
 
