@@ -11,7 +11,8 @@ import {
   LogOut,
   Menu,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Settings
 } from 'lucide-react';
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -54,6 +55,7 @@ const AdminLayout = () => {
     { path: '/admin/orders', icon: ShoppingCart, label: language === 'fr' ? 'Commandes' : 'Orders' },
     { path: '/admin/products', icon: Package, label: language === 'fr' ? 'Produits' : 'Products' },
     { path: '/admin/users', icon: Users, label: language === 'fr' ? 'Utilisateurs' : 'Users' },
+    { path: '/admin/settings', icon: Settings, label: language === 'fr' ? 'Paramètres' : 'Settings' },
   ];
 
   return (
