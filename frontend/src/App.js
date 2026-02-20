@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '@/contexts/AuthContext';
 import { LanguageProvider } from '@/contexts/LanguageContext';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import LandingPage from '@/pages/LandingPage';
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
 import ForgotPassword from '@/pages/ForgotPassword';
@@ -24,6 +25,7 @@ import AdminOrders from '@/pages/admin/AdminOrders';
 import AdminOrderDetails from '@/pages/admin/AdminOrderDetails';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminUsers from '@/pages/admin/AdminUsers';
+import AdminSettings from '@/pages/admin/AdminSettings';
 // Driver Pages
 import DriverLayout from '@/pages/driver/DriverLayout';
 import DriverDashboard from '@/pages/driver/DriverDashboard';
@@ -37,13 +39,16 @@ function App() {
       <LanguageProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
+            {/* Public Landing Page - No auth required */}
+            <Route path="/" element={<LandingPage />} />
+            
+            {/* Auth Routes */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
-            {/* Protected Routes */}
+            {/* Protected Client Routes */}
             <Route
               path="/home"
               element={
@@ -139,6 +144,7 @@ function App() {
               <Route path="orders/:orderId" element={<AdminOrderDetails />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="settings" element={<AdminSettings />} />
             </Route>
             
             {/* Driver Routes */}
@@ -155,11 +161,8 @@ function App() {
               <Route path="orders/:orderId" element={<DriverOrderDetails />} />
             </Route>
             
-            {/* Default route - redirect to home */}
-            <Route path="/" element={<Navigate to="/home" replace />} />
-            
-            {/* Catch all - redirect to home */}
-            <Route path="*" element={<Navigate to="/home" replace />} />
+            {/* Catch all - redirect to landing */}
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>
       </LanguageProvider>
