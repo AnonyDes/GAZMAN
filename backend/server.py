@@ -1229,6 +1229,118 @@ async def reset_site_settings(admin: User = Depends(get_admin_user)):
     return {"message": "Settings reset to defaults"}
 
 # ============================================
+# Services Endpoints (Public + Admin)
+# ============================================
+
+@api_router.get("/services")
+async def get_services():
+    """Get all active services for the landing page."""
+    services = await db.services.find(
+        {"is_active": True}, 
+        {"_id": 0}
+    ).sort("order", 1).to_list(50)
+    return {"services": services}
+
+@api_router.get("/admin/services")
+async def admin_get_services(admin: User = Depends(get_admin_user)):
+    """Get all services including inactive (admin only)."""
+    services = await db.services.find({}, {"_id": 0}).sort("order", 1).to_list(50)
+    total = await db.services.count_documents({})
+    return {"services": services, "total": total}
+
+@api_router.get("/admin/services/{service_id}")
+async def admin_get_service(
+    service_id: str,
+    admin: User = Depends(get_admin_user)
+):
+    """Get single service by ID (admin only)."""
+    service = await db.services.find_one({"id": service_id}, {"_id": 0})
+    if not service:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return service
+
+@api_router.post("/admin/services")
+async def admin_create_service(
+    service_data: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Create a new service (admin only)."""
+    required_fields = ["name_fr", "name_en", "category"]
+    for field in required_fields:
+        if field not in service_data:
+            raise HTTPException(status_code=400, detail=f"Missing required field: {field}")
+    
+    # Get the highest order value for positioning
+    highest_order = await db.services.find_one(
+        {}, 
+        {"order": 1},
+        sort=[("order", -1)]
+    )
+    next_order = (highest_order.get("order", 0) + 1) if highest_order else 1
+    
+    service_id = str(uuid.uuid4())
+    service = {
+        "id": service_id,
+        "name_fr": service_data["name_fr"],
+        "name_en": service_data["name_en"],
+        "description_fr": service_data.get("description_fr", ""),
+        "description_en": service_data.get("description_en", ""),
+        "category": service_data["category"],
+        "icon": service_data.get("icon", ""),
+        "image_url": service_data.get("image_url", ""),
+        "order": service_data.get("order", next_order),
+        "is_active": service_data.get("is_active", True),
+        "created_at": datetime.utcnow().isoformat(),
+        "updated_by": admin.id
+    }
+    
+    await db.services.insert_one(service)
+    if "_id" in service:
+        del service["_id"]
+    
+    return {"message": "Service created", "service": service}
+
+@api_router.put("/admin/services/{service_id}")
+async def admin_update_service(
+    service_id: str,
+    service_data: dict,
+    admin: User = Depends(get_admin_user)
+):
+    """Update a service (admin only)."""
+    existing = await db.services.find_one({"id": service_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Service not found")
+    
+    # Build update dict
+    update_fields = {}
+    allowed_fields = ["name_fr", "name_en", "description_fr", "description_en", 
+                      "category", "icon", "image_url", "order", "is_active"]
+    
+    for field in allowed_fields:
+        if field in service_data:
+            update_fields[field] = service_data[field]
+    
+    if update_fields:
+        update_fields["updated_at"] = datetime.utcnow().isoformat()
+        update_fields["updated_by"] = admin.id
+        await db.services.update_one({"id": service_id}, {"$set": update_fields})
+    
+    # Return updated service
+    updated = await db.services.find_one({"id": service_id}, {"_id": 0})
+    return {"message": "Service updated", "service": updated}
+
+@api_router.delete("/admin/services/{service_id}")
+async def admin_delete_service(
+    service_id: str,
+    admin: User = Depends(get_admin_user)
+):
+    """Delete a service (admin only)."""
+    result = await db.services.delete_one({"id": service_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return {"message": "Service deleted"}
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
