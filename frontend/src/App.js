@@ -26,6 +26,7 @@ import AdminOrderDetails from '@/pages/admin/AdminOrderDetails';
 import AdminProducts from '@/pages/admin/AdminProducts';
 import AdminUsers from '@/pages/admin/AdminUsers';
 import AdminSettings from '@/pages/admin/AdminSettings';
+import AdminServices from '@/pages/admin/AdminServices';
 // Driver Pages
 import DriverLayout from '@/pages/driver/DriverLayout';
 import DriverDashboard from '@/pages/driver/DriverDashboard';
@@ -133,6 +134,7 @@ function App() {
               <Route path="orders/:orderId" element={<AdminOrderDetails />} />
               <Route path="products" element={<AdminProducts />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="services" element={<AdminServices />} />
               <Route path="settings" element={<AdminSettings />} />
             </Route>
             
