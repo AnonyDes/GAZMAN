@@ -37,7 +37,7 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
   const { t, language, setLanguage } = useLanguage();
-  const [categories, setCategories] = useState([]);
+  const [services, setServices] = useState([]);
   const [products, setProducts] = useState([]);
   const [settings, setSettings] = useState(defaultSettings);
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,11 +50,11 @@ const LandingPage = () => {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, productsRes] = await Promise.all([
-        axios.get(`${API}/categories`),
+      const [servicesRes, productsRes] = await Promise.all([
+        axios.get(`${API}/services`),
         axios.get(`${API}/products`)
       ]);
-      setCategories(categoriesRes.data.categories);
+      setServices(servicesRes.data.services || []);
       setProducts(productsRes.data);
       setLoading(false);
     } catch (error) {
@@ -82,7 +82,7 @@ const LandingPage = () => {
     }
   };
 
-  const handleCategoryClick = (categoryValue) => {
+  const handleServiceClick = (categoryValue) => {
     navigate(`/products?category=${categoryValue}`);
   };
 
@@ -104,16 +104,6 @@ const LandingPage = () => {
     if (searchQuery.trim()) {
       navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
     }
-  };
-
-  // Category icons and colors
-  const categoryConfig = {
-    domestic: { icon: '🏠', bg: 'bg-blue-50', border: 'border-blue-200' },
-    industrial: { icon: '🏭', bg: 'bg-slate-50', border: 'border-slate-200' },
-    refill: { icon: '♻️', bg: 'bg-green-50', border: 'border-green-200' },
-    rental: { icon: '🔄', bg: 'bg-purple-50', border: 'border-purple-200' },
-    installation: { icon: '🔧', bg: 'bg-orange-50', border: 'border-orange-200' },
-    emergency: { icon: '🚨', bg: 'bg-red-50', border: 'border-red-200' }
   };
 
   return (
@@ -169,63 +159,52 @@ const LandingPage = () => {
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] py-12 md:py-20 relative overflow-hidden">
+      {/* Hero Section - No large logo */}
+      <section className="bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] py-12 md:py-16 relative overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full -mr-48 -mt-48"></div>
         <div className="absolute bottom-0 left-0 w-64 h-64 bg-white/5 rounded-full -ml-32 -mb-32"></div>
         
         <div className="max-w-7xl mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex-1 text-center md:text-left mb-8 md:mb-0">
-              <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
-                {settings.hero_title}
-              </h1>
-              <p className="text-lg text-blue-100 mb-6 max-w-xl">
-                {settings.hero_subtitle}
-              </p>
-              
-              {/* Search Bar */}
-              <form onSubmit={handleSearch} className="max-w-md mb-6">
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={language === 'fr' ? 'Rechercher un produit...' : 'Search products...'}
-                    className="w-full pl-4 pr-12 py-3 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-[#F59E0B]/50 outline-none"
-                  />
-                  <button
-                    type="submit"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#F59E0B] hover:bg-[#D97706] text-white p-2 rounded-lg transition-colors"
-                  >
-                    <Search size={18} />
-                  </button>
-                </div>
-              </form>
-
-              <button
-                onClick={handleOrderNow}
-                className="bg-[#F59E0B] hover:bg-[#D97706] text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center space-x-2"
-              >
-                <span>{settings.hero_cta}</span>
-                <ChevronRight size={20} />
-              </button>
-            </div>
+          <div className="max-w-2xl mx-auto text-center">
+            <h1 className="text-3xl md:text-5xl font-bold text-white mb-4 leading-tight">
+              {settings.hero_title}
+            </h1>
+            <p className="text-lg text-blue-100 mb-6">
+              {settings.hero_subtitle}
+            </p>
             
-            {/* Hero Image/Logo */}
-            <div className="flex-shrink-0">
-              <img 
-                src={LOGO_URL} 
-                alt="GAZMAN" 
-                className="w-48 h-48 md:w-64 md:h-64 object-contain"
-              />
-            </div>
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="max-w-lg mx-auto mb-6">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={language === 'fr' ? 'Rechercher un produit...' : 'Search products...'}
+                  className="w-full pl-4 pr-12 py-3 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:ring-4 focus:ring-[#F59E0B]/50 outline-none"
+                />
+                <button
+                  type="submit"
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#F59E0B] hover:bg-[#D97706] text-white p-2 rounded-lg transition-colors"
+                >
+                  <Search size={18} />
+                </button>
+              </div>
+            </form>
+
+            <button
+              onClick={handleOrderNow}
+              className="bg-[#F59E0B] hover:bg-[#D97706] text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all inline-flex items-center space-x-2"
+            >
+              <span>{settings.hero_cta}</span>
+              <ChevronRight size={20} />
+            </button>
           </div>
         </div>
       </section>
 
-      {/* Service Categories */}
+      {/* Services Section - Dynamic from Admin */}
       <section className="py-12 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-8">
@@ -234,28 +213,50 @@ const LandingPage = () => {
             </h2>
             <p className="text-gray-600">
               {language === 'fr' 
-                ? 'Sélectionnez une catégorie pour voir nos produits'
-                : 'Select a category to view our products'}
+                ? 'Sélectionnez un service pour voir nos produits'
+                : 'Select a service to view our products'}
             </p>
           </div>
 
-          <div className="grid grid-cols-3 md:grid-cols-6 gap-3 md:gap-4">
-            {categories.map((category) => {
-              const config = categoryConfig[category.value] || { icon: '🔥', bg: 'bg-gray-50', border: 'border-gray-200' };
-              return (
+          {services.length > 0 ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+              {services.filter(s => s.is_active).map((service) => (
                 <button
-                  key={category.value}
-                  onClick={() => handleCategoryClick(category.value)}
-                  className={`${config.bg} ${config.border} border-2 rounded-xl p-4 hover:shadow-md transition-all hover:scale-105 group`}
+                  key={service.id}
+                  onClick={() => handleServiceClick(service.category)}
+                  className="bg-white rounded-2xl shadow-md overflow-hidden hover:shadow-lg transition-all group"
                 >
-                  <div className="text-3xl mb-2">{config.icon}</div>
-                  <p className="font-semibold text-gray-900 group-hover:text-[#2563EB] transition-colors text-sm">
-                    {t(`category.${category.value}`)}
-                  </p>
+                  <div className="aspect-square bg-gray-100 relative">
+                    {service.image_url ? (
+                      <img
+                        src={service.image_url}
+                        alt={service.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <span className="text-6xl">{service.icon || '🔥'}</span>
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4 text-center">
+                    <h3 className="font-bold text-gray-900 group-hover:text-[#2563EB] transition-colors">
+                      {language === 'fr' ? service.name_fr : service.name_en}
+                    </h3>
+                    {service.description && (
+                      <p className="text-gray-500 text-sm mt-1 line-clamp-2">
+                        {language === 'fr' ? service.description_fr : service.description_en}
+                      </p>
+                    )}
+                  </div>
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">{language === 'fr' ? 'Aucun service disponible' : 'No services available'}</p>
+            </div>
+          )}
         </div>
       </section>
 
