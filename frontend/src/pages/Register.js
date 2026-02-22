@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { Eye, EyeOff, Check, X, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 // Logo URL
-const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0kss4yf8_gazman_icon.png';
+const LOGO_URL = 'https://customer-assets.emergentagent.com/job_gazman-ecommerce/artifacts/0uv4ea5b_image_d1e9bce8-c09f-42e8-8c73-a8ca1ab5cbab.png';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -14,27 +14,16 @@ const Register = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    address: '',
-    state: '',
+    phone: '',
     password: '',
-    confirmPassword: '',
-    language: 'fr'
+    confirmPassword: ''
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Password validation rules
-  const passwordRules = {
-    minLength: formData.password.length >= 8,
-    hasUpperCase: /[A-Z]/.test(formData.password),
-    hasLowerCase: /[a-z]/.test(formData.password),
-    hasNumber: /[0-9]/.test(formData.password),
-    hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
-  };
-
-  const isPasswordValid = Object.values(passwordRules).every(rule => rule);
+  // Simple password validation - just 6+ characters
+  const isPasswordValid = formData.password.length >= 6;
   const passwordsMatch = formData.password === formData.confirmPassword && formData.confirmPassword !== '';
 
   const handleChange = (e) => {
@@ -48,8 +37,8 @@ const Register = () => {
 
     if (!isPasswordValid) {
       setError(language === 'fr' 
-        ? 'Le mot de passe ne répond pas à toutes les exigences' 
-        : 'Password does not meet all requirements');
+        ? 'Le mot de passe doit contenir au moins 6 caractères' 
+        : 'Password must be at least 6 characters');
       return;
     }
 
@@ -74,26 +63,15 @@ const Register = () => {
     }
   };
 
-  const RuleIndicator = ({ met, text }) => (
-    <div className="flex items-center space-x-2 text-sm">
-      {met ? (
-        <Check size={16} className="text-green-500" />
-      ) : (
-        <X size={16} className="text-gray-400" />
-      )}
-      <span className={met ? 'text-green-600' : 'text-gray-500'}>{text}</span>
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F357F] via-[#1a4a9e] to-[#007DFF] flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-2xl p-8 my-8" data-testid="register-page">
+    <div className="min-h-screen bg-gradient-to-br from-[#2563EB] via-[#1D4ED8] to-[#1E40AF] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6" data-testid="register-page">
         {/* Back Button */}
         <button
           onClick={() => navigate('/')}
-          className="flex items-center text-gray-500 hover:text-[#0F357F] mb-6 transition-colors"
+          className="flex items-center text-gray-500 hover:text-[#2563EB] mb-4 transition-colors"
         >
-          <ArrowLeft size={20} className="mr-2" />
+          <ArrowLeft size={18} className="mr-1" />
           {language === 'fr' ? 'Retour' : 'Back'}
         </button>
 
@@ -102,19 +80,19 @@ const Register = () => {
           <img 
             src={LOGO_URL} 
             alt="GAZMAN" 
-            className="w-20 h-20 mx-auto mb-4 object-contain"
+            className="w-16 h-16 mx-auto mb-3 object-contain rounded-xl"
           />
-          <h1 className="text-3xl font-bold text-[#0F357F]">
+          <h1 className="text-2xl font-bold text-[#1E3A5F]">
             {language === 'fr' ? 'Créer un compte' : 'Create Account'}
           </h1>
-          <p className="text-gray-600 mt-2">
-            {language === 'fr' ? 'Rejoignez GAZMAN aujourd\'hui' : 'Join GAZMAN today'}
+          <p className="text-gray-500 text-sm mt-1">
+            {language === 'fr' ? 'Rejoignez GAZMAN' : 'Join GAZMAN'}
           </p>
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4" data-testid="error-message">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-4 text-sm" data-testid="error-message">
             {error}
           </div>
         )}
@@ -123,7 +101,7 @@ const Register = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Name Field */}
           <div>
-            <label htmlFor="name" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
               {language === 'fr' ? 'Nom complet' : 'Full Name'} *
             </label>
             <input
@@ -133,7 +111,7 @@ const Register = () => {
               value={formData.name}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
               placeholder="Jean Dupont"
               data-testid="name-input"
             />
@@ -141,8 +119,8 @@ const Register = () => {
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-              {language === 'fr' ? 'Adresse Email' : 'Email Address'} *
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+              {language === 'fr' ? 'Email' : 'Email'} *
             </label>
             <input
               type="email"
@@ -151,68 +129,32 @@ const Register = () => {
               value={formData.email}
               onChange={handleChange}
               required
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none transition-all"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
               placeholder="votre@email.com"
               data-testid="email-input"
             />
           </div>
 
-          {/* Address and State in two columns */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label htmlFor="address" className="block text-sm font-semibold text-gray-700 mb-2">
-                {language === 'fr' ? 'Adresse' : 'Physical Address'}
-              </label>
-              <input
-                type="text"
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none transition-all"
-                placeholder={language === 'fr' ? 'Bastos, Yaoundé' : '123 Main Street'}
-                data-testid="address-input"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="state" className="block text-sm font-semibold text-gray-700 mb-2">
-                {language === 'fr' ? 'Région' : 'State/Region'}
-              </label>
-              <input
-                type="text"
-                id="state"
-                name="state"
-                value={formData.state}
-                onChange={handleChange}
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none transition-all"
-                placeholder={language === 'fr' ? 'Centre' : 'NY'}
-                data-testid="state-input"
-              />
-            </div>
-          </div>
-
-          {/* Language Selection */}
+          {/* Phone Field */}
           <div>
-            <label htmlFor="language" className="block text-sm font-semibold text-gray-700 mb-2">
-              {language === 'fr' ? 'Langue préférée' : 'Preferred Language'}
+            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
+              {language === 'fr' ? 'Téléphone' : 'Phone'}
             </label>
-            <select
-              id="language"
-              name="language"
-              value={formData.language}
+            <input
+              type="tel"
+              id="phone"
+              name="phone"
+              value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none transition-all"
-              data-testid="language-select"
-            >
-              <option value="fr">Français</option>
-              <option value="en">English</option>
-            </select>
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
+              placeholder="+237 6XX XXX XXX"
+              data-testid="phone-input"
+            />
           </div>
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
               {language === 'fr' ? 'Mot de passe' : 'Password'} *
             </label>
             <div className="relative">
@@ -223,8 +165,8 @@ const Register = () => {
                 value={formData.password}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none pr-12 transition-all"
-                placeholder={language === 'fr' ? 'Créez un mot de passe fort' : 'Create a strong password'}
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none pr-12 transition-all"
+                placeholder={language === 'fr' ? 'Min. 6 caractères' : 'Min. 6 characters'}
                 data-testid="password-input"
               />
               <button
@@ -235,61 +177,33 @@ const Register = () => {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-          </div>
-
-          {/* Password Requirements */}
-          {formData.password && (
-            <div className="bg-gray-50 p-4 rounded-xl space-y-2">
-              <p className="text-sm font-semibold text-gray-700 mb-2">
-                {language === 'fr' ? 'Exigences du mot de passe:' : 'Password Requirements:'}
+            {formData.password && formData.password.length < 6 && (
+              <p className="text-xs text-orange-500 mt-1">
+                {language === 'fr' ? 'Minimum 6 caractères' : 'Minimum 6 characters'}
               </p>
-              <RuleIndicator met={passwordRules.minLength} text={language === 'fr' ? 'Au moins 8 caractères' : 'At least 8 characters'} />
-              <RuleIndicator met={passwordRules.hasUpperCase} text={language === 'fr' ? 'Une lettre majuscule' : 'One uppercase letter'} />
-              <RuleIndicator met={passwordRules.hasLowerCase} text={language === 'fr' ? 'Une lettre minuscule' : 'One lowercase letter'} />
-              <RuleIndicator met={passwordRules.hasNumber} text={language === 'fr' ? 'Un chiffre' : 'One number'} />
-              <RuleIndicator met={passwordRules.hasSpecialChar} text={language === 'fr' ? 'Un caractère spécial' : 'One special character'} />
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Confirm Password Field */}
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 mb-2">
-              {language === 'fr' ? 'Confirmer le mot de passe' : 'Confirm Password'} *
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+              {language === 'fr' ? 'Confirmer' : 'Confirm'} *
             </label>
-            <div className="relative">
-              <input
-                type={showConfirmPassword ? 'text' : 'password'}
-                id="confirmPassword"
-                name="confirmPassword"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#007DFF] focus:border-transparent outline-none pr-12 transition-all"
-                placeholder={language === 'fr' ? 'Confirmez votre mot de passe' : 'Confirm your password'}
-                data-testid="confirm-password-input"
-              />
-              <button
-                type="button"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
-              >
-                {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-              </button>
-            </div>
-            {formData.confirmPassword && (
-              <div className="mt-2">
-                {passwordsMatch ? (
-                  <div className="flex items-center space-x-2 text-sm text-green-600">
-                    <Check size={16} />
-                    <span>{language === 'fr' ? 'Les mots de passe correspondent' : 'Passwords match'}</span>
-                  </div>
-                ) : (
-                  <div className="flex items-center space-x-2 text-sm text-red-600">
-                    <X size={16} />
-                    <span>{language === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match'}</span>
-                  </div>
-                )}
-              </div>
+            <input
+              type={showPassword ? 'text' : 'password'}
+              id="confirmPassword"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#2563EB] focus:border-transparent outline-none transition-all"
+              placeholder={language === 'fr' ? 'Confirmer le mot de passe' : 'Confirm password'}
+              data-testid="confirm-password-input"
+            />
+            {formData.confirmPassword && !passwordsMatch && (
+              <p className="text-xs text-red-500 mt-1">
+                {language === 'fr' ? 'Les mots de passe ne correspondent pas' : 'Passwords do not match'}
+              </p>
             )}
           </div>
 
@@ -297,21 +211,21 @@ const Register = () => {
           <button
             type="submit"
             disabled={loading || !isPasswordValid || !passwordsMatch}
-            className="w-full bg-[#0F357F] hover:bg-[#007DFF] text-white py-4 rounded-xl font-bold text-lg transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed mt-6 shadow-lg"
+            className="w-full bg-[#2563EB] hover:bg-[#1D4ED8] text-white py-3 rounded-xl font-bold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed mt-2"
             data-testid="register-button"
           >
             {loading 
-              ? (language === 'fr' ? 'Création en cours...' : 'Creating Account...') 
+              ? (language === 'fr' ? 'Création...' : 'Creating...') 
               : (language === 'fr' ? 'Créer mon compte' : 'Create Account')
             }
           </button>
         </form>
 
         {/* Login Link */}
-        <p className="text-center mt-6 text-sm text-gray-600">
-          {language === 'fr' ? 'Vous avez déjà un compte?' : 'Already have an account?'}{' '}
-          <Link to="/login" className="text-[#0F357F] hover:text-[#007DFF] font-bold" data-testid="login-link">
-            {language === 'fr' ? 'Se connecter' : 'Sign in'}
+        <p className="text-center mt-5 text-sm text-gray-600">
+          {language === 'fr' ? 'Déjà un compte?' : 'Already have an account?'}{' '}
+          <Link to="/login" className="text-[#2563EB] hover:text-[#1D4ED8] font-bold" data-testid="login-link">
+            {language === 'fr' ? 'Se connecter' : 'Login'}
           </Link>
         </p>
       </div>
