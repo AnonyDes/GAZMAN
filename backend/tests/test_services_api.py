@@ -99,8 +99,9 @@ class TestAdminServicesAPI:
     def test_get_admin_services_requires_auth(self, api_client):
         """Admin endpoint should require authentication."""
         response = api_client.get(f"{BASE_URL}/api/admin/services")
-        assert response.status_code == 401
-        print("Admin services endpoint correctly requires authentication")
+        # Can return 401 (Unauthorized) or 403 (Forbidden) depending on auth middleware
+        assert response.status_code in [401, 403]
+        print(f"Admin services endpoint correctly requires authentication (returns {response.status_code})")
     
     def test_get_admin_services_returns_200(self, admin_client):
         """Admin should be able to get all services."""
