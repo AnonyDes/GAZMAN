@@ -48,28 +48,17 @@ function App() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             
+            {/* Public Routes - Products viewable without login */}
+            <Route path="/products" element={<ProductCatalog />} />
+            <Route path="/products/:productId" element={<ProductDetail />} />
+            <Route path="/product/:productId" element={<ProductDetail />} />
+            
             {/* Protected Client Routes */}
             <Route
               path="/home"
               element={
                 <ProtectedRoute>
                   <Homepage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/products"
-              element={
-                <ProtectedRoute>
-                  <ProductCatalog />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/products/:productId"
-              element={
-                <ProtectedRoute>
-                  <ProductDetail />
                 </ProtectedRoute>
               }
             />
