@@ -51,7 +51,7 @@ const LandingPage = () => {
   const fetchData = async () => {
     try {
       const [servicesRes, productsRes] = await Promise.all([
-        axios.get(`${API}/services`),
+        axios.get(`${API}/services`).catch(() => ({ data: { services: [] } })),
         axios.get(`${API}/products`)
       ]);
       setServices(servicesRes.data.services || []);
