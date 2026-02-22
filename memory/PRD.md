@@ -189,4 +189,4 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
 - `/app/test_reports/iteration_2.json` - Order management testing
 
 ## Preview URL
-https://gazman-ecommerce.preview.emergentagent.com
+https://gazman-preview.preview.emergentagent.com
