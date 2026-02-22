@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
 import { ArrowLeft, Minus, Plus, ShoppingCart, Star, Clock } from 'lucide-react';
 import { formatCurrency } from '@/utils/currency';
@@ -11,7 +12,8 @@ const API = `${BACKEND_URL}/api`;
 const ProductDetail = () => {
   const navigate = useNavigate();
   const { productId } = useParams();
-  const { token } = useAuth();
+  const { token, isAuthenticated } = useAuth();
+  const { language, t } = useLanguage();
   
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -48,6 +50,13 @@ const ProductDetail = () => {
   };
 
   const handleAddToCart = async () => {
+    // Check if user is logged in
+    if (!isAuthenticated) {
+      // Redirect to login with return URL
+      navigate('/login', { state: { from: `/products/${productId}` } });
+      return;
+    }
+
     setAddingToCart(true);
     try {
       await axios.post(
@@ -69,7 +78,7 @@ const ProductDetail = () => {
       }, 1500);
     } catch (error) {
       console.error('Error adding to cart:', error);
-      alert('Failed to add to cart. Please try again.');
+      alert(language === 'fr' ? 'Erreur lors de l\'ajout au panier' : 'Failed to add to cart');
       setAddingToCart(false);
     }
   };
@@ -77,7 +86,7 @@ const ProductDetail = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2563EB]"></div>
       </div>
     );
   }
