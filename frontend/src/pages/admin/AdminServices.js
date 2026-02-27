@@ -53,7 +53,6 @@ const AdminServices = () => {
   const fetchServices = useCallback(async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem('token');
       const response = await axios.get(`${API}/admin/services`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -65,7 +64,7 @@ const AdminServices = () => {
     } finally {
       setLoading(false);
     }
-  }, [language]);
+  }, [language, token]);
 
   useEffect(() => {
     fetchServices();
@@ -116,7 +115,6 @@ const AdminServices = () => {
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
       const config = { headers: { Authorization: `Bearer ${token}` } };
 
       if (isCreating) {
@@ -141,7 +139,6 @@ const AdminServices = () => {
     }
 
     try {
-      const token = localStorage.getItem('token');
       await axios.delete(`${API}/admin/services/${serviceId}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -153,7 +150,6 @@ const AdminServices = () => {
 
   const handleToggleActive = async (service) => {
     try {
-      const token = localStorage.getItem('token');
       await axios.put(`${API}/admin/services/${service.id}`, 
         { is_active: !service.is_active },
         { headers: { Authorization: `Bearer ${token}` } }
