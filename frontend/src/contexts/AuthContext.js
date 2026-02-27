@@ -8,13 +8,13 @@ const API = `${BACKEND_URL}/api`;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(localStorage.getItem('token') || sessionStorage.getItem('token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // Check if user is logged in on mount
     const initAuth = async () => {
-      const savedToken = localStorage.getItem('token');
+      const savedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
       if (savedToken) {
         try {
           const response = await axios.get(`${API}/auth/me`, {
@@ -25,6 +25,7 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Auth initialization failed:', error);
           localStorage.removeItem('token');
+          sessionStorage.removeItem('token');
           setToken(null);
         }
       }
