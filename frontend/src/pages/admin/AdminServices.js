@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import axios from 'axios';
 import { 
@@ -29,6 +30,7 @@ const CATEGORIES = [
 ];
 
 const AdminServices = () => {
+  const { token } = useAuth();
   const { language } = useLanguage();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
