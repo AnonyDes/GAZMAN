@@ -55,6 +55,18 @@ Build a full-stack e-commerce application named "GAZ MAN" for selling gas cylind
   - Update products (name, price, stock, etc.)
   - Delete products
 - [x] **Users Management**: Read-only list of all registered users
+- [x] **Site Settings Management**: Admin page to edit homepage hero text and promo banners
+- [x] **Services Management**: Full CRUD for homepage service cards
+  - Create/Edit/Delete services with bilingual names and descriptions
+  - Upload service images or use emoji icons
+  - Toggle service visibility (active/inactive)
+  - Services displayed dynamically on public landing page
+
+### Phase 6 - Public-First User Experience ✅
+- [x] **Public Landing Page**: New entry point with hero section, services, and products
+- [x] **Public Product Browsing**: Products viewable without login
+- [x] **Dynamic Homepage Content**: Services fetched from database, editable by admin
+- [x] **UI/Branding Overhaul**: Blue/orange color scheme matching GAZMAN logo
 
 ### Order Status Timeline
 The app supports 5 order statuses:
@@ -109,6 +121,13 @@ cd /app/backend && python create_admin.py
 | PUT | /api/admin/products/{id} | Update product |
 | DELETE | /api/admin/products/{id} | Delete product |
 | GET | /api/admin/users | List all users |
+| GET | /api/site-settings | Get homepage settings (public) |
+| PUT | /api/admin/site-settings | Update homepage settings |
+| GET | /api/services | Get active services (public) |
+| GET | /api/admin/services | List all services |
+| POST | /api/admin/services | Create service |
+| PUT | /api/admin/services/{id} | Update service |
+| DELETE | /api/admin/services/{id} | Delete service |
 
 ## Database Schema
 ```
@@ -117,6 +136,8 @@ products: {id, name, brand, price, stock, image_url, description, category, capa
 carts: {user_id, items: [{product_id, product_name, product_image, quantity, size, price}], updated_at}
 orders: {id, user_id, items, subtotal, delivery_fee, total, delivery_address, phone, payment_method, status, created_at}
 addresses: {id, user_id, name, city, quartier, description, phone, is_default, created_at}
+site_settings: {id: "main", hero_title, hero_subtitle, hero_cta, promo_title, promo_subtitle, service_hours}
+services: {id, name_fr, name_en, description_fr, description_en, category, icon, image_url, order, is_active, created_at}
 ```
 
 ## File Structure
@@ -156,7 +177,10 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
         │   │   ├── AdminOrders.js
         │   │   ├── AdminOrderDetails.js
         │   │   ├── AdminProducts.js
-        │   │   └── AdminUsers.js
+        │   │   ├── AdminUsers.js
+        │   │   ├── AdminSettings.js    # Homepage text settings
+        │   │   └── AdminServices.js    # Homepage services management
+        │   ├── LandingPage.js          # Public homepage
         │   └── (Auth pages)
         ├── utils/
         │   └── currency.js
@@ -187,6 +211,13 @@ addresses: {id, user_id, name, city, quartier, description, phone, is_default, c
 ## Test Reports
 - `/app/test_reports/iteration_1.json` - Cart operations testing
 - `/app/test_reports/iteration_2.json` - Order management testing
+- `/app/backend/tests/test_services_api.py` - Services API testing
+
+## Recent Updates (Feb 2026)
+- Implemented Admin Services Management feature (full CRUD)
+- Fixed authentication token handling in AuthContext (sessionStorage support)
+- Added Services navigation link in admin sidebar
+- Landing page now dynamically displays services from database
 
 ## Preview URL
 https://gazman-preview.preview.emergentagent.com
