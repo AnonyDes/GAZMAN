@@ -1343,6 +1343,84 @@ async def admin_delete_service(
     return {"message": "Service deleted"}
 
 # ============================================
+# File Upload Endpoints
+# ============================================
+
+# Ensure uploads directory exists
+UPLOADS_DIR = ROOT_DIR / "uploads"
+UPLOADS_DIR.mkdir(exist_ok=True)
+
+# Allowed image extensions
+ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".gif", ".webp"}
+MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB
+
+@api_router.post("/admin/upload")
+async def upload_image(
+    file: UploadFile = File(...),
+    admin: User = Depends(get_admin_user)
+):
+    """Upload an image file (admin only). Returns the public URL."""
+    
+    # Validate file extension
+    file_ext = Path(file.filename).suffix.lower()
+    if file_ext not in ALLOWED_EXTENSIONS:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"File type not allowed. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
+        )
+    
+    # Read file content to check size
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(
+            status_code=400,
+            detail=f"File too large. Maximum size: {MAX_FILE_SIZE // (1024*1024)}MB"
+        )
+    
+    # Generate unique filename
+    unique_id = str(uuid.uuid4())[:8]
+    timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+    safe_filename = f"{timestamp}_{unique_id}{file_ext}"
+    file_path = UPLOADS_DIR / safe_filename
+    
+    # Save file
+    with open(file_path, "wb") as f:
+        f.write(content)
+    
+    # Generate public URL
+    # The URL will be served via /api/uploads/{filename}
+    public_url = f"/api/uploads/{safe_filename}"
+    
+    return {
+        "message": "File uploaded successfully",
+        "filename": safe_filename,
+        "url": public_url,
+        "size": len(content)
+    }
+
+@api_router.get("/uploads/{filename}")
+async def get_uploaded_file(filename: str):
+    """Serve uploaded files."""
+    from fastapi.responses import FileResponse
+    
+    file_path = UPLOADS_DIR / filename
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    # Determine content type
+    ext = Path(filename).suffix.lower()
+    content_types = {
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".gif": "image/gif",
+        ".webp": "image/webp"
+    }
+    content_type = content_types.get(ext, "application/octet-stream")
+    
+    return FileResponse(file_path, media_type=content_type)
+
+# ============================================
 # Health Check Endpoints
 # ============================================
 
