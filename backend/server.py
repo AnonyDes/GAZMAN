@@ -1,4 +1,5 @@
-from fastapi import FastAPI, APIRouter, HTTPException, status, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, status, Depends, UploadFile, File
+from fastapi.staticfiles import StaticFiles
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -8,6 +9,7 @@ from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Optional
 import uuid
+import shutil
 
 # Import local modules
 from models import (
